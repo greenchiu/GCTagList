@@ -28,6 +28,10 @@ implementation the GCTagLabelListDataSource and call the public method `reloadDa
 ```
 
 ```Objective-C   
+- (NSInteger)numberOfTagLabelInTagList:(GCTagList *)tagList {
+    return self.tagNames.count;
+}
+
 - (GCTagLabel*)tagList:(GCTagList *)tagList tagLabelAtIndex:(NSInteger)index {
     
     static NSString* identifier = @"TagLabelIdentifier";
