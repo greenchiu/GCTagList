@@ -8,18 +8,13 @@
 
 #import "GCTagLabel.h"
 
-
-
 #define DEFAULT_LABEL_BACKGROUND_COLOR [UIColor lightGrayColor]
 #define DEFAULT_LABEL_TEXT_COLOR [UIColor blackColor]
 #define LABEL_CORNER_RADIUS 12.f
 #define LABEL_FONT_SIZE 13.f
-
 #define HORIZONTAL_PADDING 7.0f
 #define VERTICAL_PADDING 3.0f
-
 #define ACCESSORYVIEW_WIDTH 24.f
-
 #define ACCESSORY_SIZE CGSizeMake(40, 40)
 
 CGFloat const LabelDefaultFontSize = LABEL_FONT_SIZE;
@@ -99,6 +94,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     if(self) {
         _selected = NO;
         self.maxWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
+        self.selectedEnabled = YES;
         self.privateReuseIdentifier = identifier;
         self.fitSize = CGSizeMake(self.maxWidth, 1500);
         self.labelTextColor = DEFAULT_LABEL_TEXT_COLOR;
@@ -120,7 +116,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.label.textAlignment = UITextAlignmentCenter;
         self.label.textColor = self.labelTextColor;
         self.label.backgroundColor = [UIColor clearColor];
-        self.label.font = [UIFont systemFontOfSize:LABEL_FONT_SIZE];
+        self.label.font = [UIFont fontWithName:@"HelveticaNeue" size:LABEL_FONT_SIZE];
         [self addSubview:self.label];
     }
     
@@ -199,7 +195,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 
 - (void)setSelected:(BOOL)selected animation:(BOOL)animated{
     _selected = selected;
-    
+    if(!self.selectedEnabled) {
+        return;
+    }
     NSArray* colorsArray = !selected ?
     [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], (id)[self.labelBackgroundColor CGColor], nil] :
     [NSArray arrayWithObjects:(id)[DEFAULT_LABEL_BACKGROUND_COLOR CGColor], (id)[self.labelBackgroundColor CGColor], nil] ;
@@ -217,6 +215,5 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         [CATransaction commit];
     }
 }
-
 
 @end

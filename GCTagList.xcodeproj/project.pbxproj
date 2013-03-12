@@ -19,7 +19,6 @@
 		18A0780116DE07F8005CBA7A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0780016DE07F8005CBA7A /* ViewController.m */; };
 		18A0780416DE07F8005CBA7A /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18A0780216DE07F8005CBA7A /* ViewController.xib */; };
 		18A0781116DE08D3005CBA7A /* CGTagLabelList.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 18A0780B16DE08D3005CBA7A /* CGTagLabelList.bundle */; };
-		18A0781216DE08D3005CBA7A /* GCTagLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0780E16DE08D3005CBA7A /* GCTagLabel.m */; };
 		18A0781316DE08D3005CBA7A /* GCTagList.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0781016DE08D3005CBA7A /* GCTagList.m */; };
 		18A0781516DE0966005CBA7A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18A0781416DE0966005CBA7A /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
@@ -210,7 +209,6 @@
 				18A077F416DE07F8005CBA7A /* main.m in Sources */,
 				18A077F816DE07F8005CBA7A /* AppDelegate.m in Sources */,
 				18A0780116DE07F8005CBA7A /* ViewController.m in Sources */,
-				18A0781216DE08D3005CBA7A /* GCTagLabel.m in Sources */,
 				18A0781316DE08D3005CBA7A /* GCTagList.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
