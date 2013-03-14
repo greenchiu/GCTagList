@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
+#define version @"0.0.21"
+#define update_date @"2013.03.14 10:36"
+
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
         #define GC_SUPPORT_ARC 1
@@ -54,8 +57,8 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 @class GCTagList, GCTagLabel;
 
 #pragma mark -
-#pragma mark GCTagLabelListDelegate
-@protocol GCTagLabelListDelegate <NSObject>
+#pragma mark GCTagListDelegate
+@protocol GCTagListDelegate <NSObject>
 @optional
 /**
  * 在reloadData, 如果TagList的高度有改變, 這個Mehtod會被觸發.
@@ -85,8 +88,8 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 @end
 
 #pragma mark -
-#pragma mark GCTagLabelListDataSource
-@protocol GCTagLabelListDataSource <NSObject>
+#pragma mark GCTagListDataSource
+@protocol GCTagListDataSource <NSObject>
 /**
  * 在TagList中有多少個TagLabel.
  * how many count for taglist to display.
@@ -116,8 +119,8 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 #pragma mark -
 #pragma mark GCTagList
 @interface GCTagList : UIView
-@property (nonatomic, GC_WEAK) id<GCTagLabelListDelegate> delegate;
-@property (nonatomic, GC_WEAK) id<GCTagLabelListDataSource> dataSource;
+@property (nonatomic, GC_WEAK) id<GCTagListDelegate> delegate;
+@property (nonatomic, GC_WEAK) id<GCTagListDataSource> dataSource;
 @property (assign) CGFloat firstRowLeftMargin;
 
 /**
@@ -148,6 +151,15 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
                                      tagListWith:(CGFloat)tagListWith
                                 tagLabelMaxWidth:(CGFloat)tagLabelMaxWidth
                                     tagLabelText:(NSArray*)texts __deprecated;
+
+/**
+ * Only support TagLabelAccessoryType = GCTagLabelAccessoryNone.
+ */
++ (NSInteger)rowOfTagListWithFirstRowLeftMargin:(CGFloat)leftMargin
+                                    tagListWith:(CGFloat)tagListWith
+                               tagLabelMaxWidth:(CGFloat)tagLabelMaxWidth
+                                   tagLabelText:(NSArray*)texts;
+
 /**
  * 取得高度
  * get height of rows.
@@ -166,12 +178,8 @@ extern CGFloat const LabelVerticalPadding;
 @property (nonatomic, GC_STRONG) UIColor *labelTextColor;
 @property (nonatomic, GC_STRONG) UIColor *labelBackgroundColor;
 @property (assign) GCTagLabelAccessoryType accessoryType;
-@property (assign) BOOL selectedEnabled;
+@property (assign) BOOL selectedEnabled; // if YES, the taglabel could show selected state. default is YES.
 @property (readonly) BOOL selected;
-
-/**
- *
- */
 @property (assign) CGSize fitSize;
 
 /**

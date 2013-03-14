@@ -7,15 +7,17 @@
 //
 
 #import "GCTagList.h"
-//#import "GCTagLabel.h"
 
 #define LABEL_MARGIN 2.0f 
 #define BOTTOM_MARGIN 5.0f 
 
-@interface GCTagLabel (AbstractTagLabelHeight)
+@interface GCTagLabel (Private)
 + (CGRect)rectangleOfTagLabelWithText:(NSString*)textStr
                              maxWidth:(CGFloat)maxWidth
                         accessoryType:(GCTagLabelAccessoryType)type;
+
+- (void)resizeLabel;
+
 @end
 
 @interface GCTagList ()
@@ -23,6 +25,9 @@
 @property (nonatomic, GC_STRONG) NSMutableDictionary* reuseSet;
 @property (assign) CGFloat rowMaxWidth;
 @property (assign) NSInteger nowSelected;
+
+- (GCTagLabel*)tagLabelForInterruptIndex:(NSInteger)startIndex
+                             preTagFrame:(CGRect)rect;
 @end
 
 @implementation GCTagList
@@ -99,14 +104,12 @@
     CGFloat totalHeight = 0;
     for (int i = 0; i < numberOfTagLabel; i++) {
         GCTagLabel* tag = [self.dataSource tagList:self tagLabelAtIndex:i];
-        
+        //=======
+        tag.maxWidth = CGRectGetWidth(self.frame);
+        [tag resizeLabel];
+        //=======
         [tag setValue:[NSString stringWithFormat:@"%d",i] forKeyPath:@"index"];
-        if(tag.accessoryType != GCTagLabelAccessoryNone) {
-            UIButton* accessoryButton = [tag valueForKeyPath:@"accessoryButton"];
-            [accessoryButton addTarget:self
-                                action:@selector(handleTouchUpInsideTagAccessoryButton:)
-                      forControlEvents:UIControlEventTouchUpInside];
-        }
+        [self addTappedTarget:tag];
         //======
         CGRect viewFrame = tag.frame;
         CGFloat leftMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? self.firstRowLeftMargin : 0;
@@ -118,55 +121,8 @@
             if(CGRectGetWidth(preTagLabelFrame) > 0.f && maxRow > 0) {
                 nowRow ++;
                 if(nowRow > maxRow)  {
-                    
-                    NSString* tempText;
-                    if([self.delegate respondsToSelector:@selector(tagList:labelTextForGroupTagLabel:)]) {
-                        tempText = [self.delegate tagList:self labelTextForGroupTagLabel:i];
-                    } else {
-                        tempText = @"others";
-                    }
-                    
-                    CGRect tempRect = [GCTagLabel rectangleOfTagLabelWithText:tempText
-                                                                     maxWidth:tag.maxWidth
-                                                                accessoryType:groupType];
-                    
-                    
-                    float last_width = leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width +
-                    CGRectGetWidth(tempRect) + leftMargin;
-                    /**
-                     * 如果還是超出預期, 就找上一個TagLabel
-                     */
-                    if (last_width > self.rowMaxWidth) {
-                        
-                        if(tag.reuseIdentifier) {
-                            NSMutableSet* tempSet = self.reuseSet[tag.reuseIdentifier];
-                            if(!tempSet) {
-                                tempSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
-                            }
-                            [tempSet addObject:tag];
-                            [self.reuseSet setObject:tempSet forKey:tag.reuseIdentifier];
-                        }
-                        tag = [self tagLabelAtIndex:i-1];
-                        
-                        /**
-                         * 這邊可能會有因為user隨著數字變動傳回來字數長短不一造成的錯誤, 還需要再調整
-                         */
-                        NSString *preGroupText;
-                        if([self.delegate respondsToSelector:@selector(tagList:labelTextForGroupTagLabel:)]) {
-                            preGroupText = [self.delegate tagList:self labelTextForGroupTagLabel:i-1];
-                        } else {
-                            preGroupText = @"others";
-                        }
-                        
-                        [tag setLabelText:preGroupText accessoryType:groupType];
-                        viewFrame = tag.frame;
-                        viewFrame.origin = preTagLabelFrame.origin;
-                    } else {
-                        [tag setLabelText:tempText accessoryType:groupType];
-                        viewFrame = tag.frame;
-                        viewFrame.origin = CGPointMake(leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + labelMargin ,
-                                                       preTagLabelFrame.origin.y);
-                    }
+                    tag = [self tagLabelForInterruptIndex:i preTagFrame:preTagLabelFrame];
+                    viewFrame = tag.frame;
                 } else {
                     viewFrame.origin = CGPointMake(0,
                                                    preTagLabelFrame.origin.y +
@@ -220,6 +176,14 @@
     }
 }
 
+- (UIView*)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView* temp = [super hitTest:point withEvent:event];
+    if(temp == self) {
+        return nil;
+    }
+    return temp;
+}
+
 #pragma mark -
 #pragma mark Private
 - (void)handleTouchUpInsideTagAccessoryButton:(id)sender {
@@ -239,6 +203,72 @@
         }
     }
     return tagLabel;
+}
+
+- (GCTagLabel*)tagLabelForInterruptIndex:(NSInteger)startIndex
+                             preTagFrame:(CGRect)rect {
+    
+    GCTagLabelAccessoryType groupType = GCTagLabelAccessoryNone;
+    if([self.dataSource respondsToSelector:@selector(accessoryTypeForGroupTagLabel)]) {
+        groupType = [self.dataSource accessoryTypeForGroupTagLabel];
+    }
+    
+    GCTagLabel* tag = nil;
+    for (int i = startIndex; i > 0; i--) {
+        tag = [self tagLabelAtIndex:i];
+        if(!tag)
+            continue;
+        
+        rect = (i-1)>=0 ? [self tagLabelAtIndex:(i-1)].frame : CGRectZero;
+        CGFloat leftMargin = CGRectGetWidth(rect) == 0.f ? self.firstRowLeftMargin : 0;
+        NSString* tempText;
+        if([self.delegate respondsToSelector:@selector(tagList:labelTextForGroupTagLabel:)]) {
+            tempText = [self.delegate tagList:self labelTextForGroupTagLabel:i];
+        } else {
+            tempText = @"others";
+        }
+        
+        CGRect tempRect = [GCTagLabel rectangleOfTagLabelWithText:tempText
+                                                         maxWidth:tag.maxWidth
+                                                    accessoryType:groupType];
+        
+        float last_width = leftMargin + rect.origin.x + rect.size.width +
+        CGRectGetWidth(tempRect) + leftMargin;
+        if (last_width > self.rowMaxWidth) {
+            if(tag.reuseIdentifier) {
+                NSMutableSet* tempSet = self.reuseSet[tag.reuseIdentifier];
+                if(!tempSet) {
+                    tempSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
+                }
+                [tempSet addObject:tag];
+                [self.reuseSet setObject:tempSet forKey:tag.reuseIdentifier];
+            }
+            [tag removeFromSuperview];
+            continue;
+        }
+        rect = tag.frame;
+        [tag setLabelText:tempText accessoryType:groupType];
+        [tag resizeLabel];
+        [self addTappedTarget:tag];
+        
+        CGRect frame = tag.frame;
+        frame.origin = rect.origin;
+        tag.frame = frame;
+        break;
+    }
+    return tag;
+}
+
+- (void)addTappedTarget:(GCTagLabel*)tag {
+    if(tag.accessoryType != GCTagLabelAccessoryNone) {
+        UIButton* accessoryButton = [tag valueForKeyPath:@"accessoryButton"];
+        
+        if(accessoryButton.allTargets.count == 0) {
+            [accessoryButton addTarget:self
+                                action:@selector(handleTouchUpInsideTagAccessoryButton:)
+                      forControlEvents:UIControlEventTouchUpInside];
+        }
+    }
 }
 
 #pragma mark -
@@ -313,6 +343,41 @@
     return height;
 }
 
+
++ (NSInteger)rowOfTagListWithFirstRowLeftMargin:(CGFloat)leftMargin
+                                    tagListWith:(CGFloat)tagListWith
+                               tagLabelMaxWidth:(CGFloat)tagLabelMaxWidth
+                                   tagLabelText:(NSArray*)texts {
+    NSInteger row = 1;
+    CGRect preLabelFrame = CGRectZero;
+    for (NSString* text in texts) {
+        CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:LabelDefaultFontSize]
+                           constrainedToSize:CGSizeMake(9999, 9999)
+                               lineBreakMode:NSLineBreakByWordWrapping];
+        textSize.width += LabelHorizontalPadding * 2;
+        textSize.height += LabelVerticalPadding * 2;
+        BOOL needCorrection =( (textSize.width ) > tagLabelMaxWidth );
+        if(needCorrection) {
+            textSize.width = tagLabelMaxWidth;
+        }
+        CGRect tagLabelFrame;
+        tagLabelFrame.origin = CGPointZero;
+        tagLabelFrame.size = textSize;
+        
+        leftMargin = CGRectGetWidth(preLabelFrame) == 0.f ? leftMargin : 0;
+        if (leftMargin + preLabelFrame.origin.x + preLabelFrame.size.width + CGRectGetWidth(tagLabelFrame) + LABEL_MARGIN
+            > tagListWith) {
+            tagLabelFrame.origin = CGPointMake(0, preLabelFrame.origin.y + CGRectGetHeight(tagLabelFrame) + BOTTOM_MARGIN);
+            row++;
+        } else {
+            tagLabelFrame.origin = CGPointMake(leftMargin + preLabelFrame.origin.x + preLabelFrame.size.width + LABEL_MARGIN , preLabelFrame.origin.y);
+        }
+        preLabelFrame = tagLabelFrame;
+    }
+    
+    return row;
+}
+
 + (CGFloat)heightOfRows:(NSInteger)numberOfRow {
     NSString* text = @"I'm Sample.";
     CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:LabelDefaultFontSize]
@@ -322,52 +387,6 @@
     CGFloat height = (textSize.height+LabelVerticalPadding*2)*numberOfRow;
     height += (BOTTOM_MARGIN * (numberOfRow-1));
     return height;
-}
-@end
-
-@implementation GCTagLabel (AbstractTagLabelHeight)
-+ (CGRect)rectangleOfTagLabelWithText:(NSString*)textStr
-                             maxWidth:(CGFloat)maxWidth
-                        accessoryType:(GCTagLabelAccessoryType)type {
-    CGSize textSize = [textStr sizeWithFont:[UIFont systemFontOfSize:LabelDefaultFontSize]
-                          constrainedToSize:CGSizeMake(9999, 9999)
-                              lineBreakMode:NSLineBreakByWordWrapping];
-    
-    CGFloat deviationValue = type != GCTagLabelAccessoryNone ? 24 : 0;
-    BOOL needCorrection =( (textSize.width + deviationValue + LabelHorizontalPadding * 2) > maxWidth );
-    if(needCorrection) {
-        textSize.width = maxWidth - LabelHorizontalPadding * 2 - deviationValue ;
-    }
-    
-    
-    CGRect labelFrame;
-    labelFrame.origin = CGPointMake(LabelHorizontalPadding, 0);
-    CGRect buttonFrame = CGRectZero;
-    if(type != GCTagLabelAccessoryNone) {
-        CGPoint buttonPoint = CGPointZero;
-        
-        buttonPoint.x = textSize.width + LabelHorizontalPadding;
-        if(!needCorrection)
-            buttonPoint.x -= 9;
-        buttonPoint.y = (textSize.height - 24) / 2 ;
-        
-        buttonFrame = CGRectMake(0, 0, 24, 24);
-        buttonFrame.origin = buttonPoint;
-    }
-    labelFrame.size = textSize;
-    
-    CGFloat viewWidth;
-    if(!CGRectEqualToRect(buttonFrame, CGRectZero))
-        viewWidth = buttonFrame.origin.x + CGRectGetWidth(buttonFrame);
-    else
-        viewWidth = labelFrame.origin.x + CGRectGetWidth(labelFrame);
-    
-    viewWidth += LabelHorizontalPadding;
-    //===========
-    CGRect viewFrame = CGRectZero;
-    viewFrame.size.width = viewWidth;
-    viewFrame.size.height = textSize.height;
-    return viewFrame;
 }
 @end
 
@@ -393,10 +412,10 @@ NSString* imageFontNameForType(GCTagLabelAccessoryType type) {
     
     switch (type) {
         case GCTagLabelAccessoryArrowFont:
-            imageFontName = @"CGTagLabelList.bundle/blue_arrow";
+            imageFontName = @"CGTagLabelList.bundle/blue_arrow.png";
             break;
         case GCTagLabelAccessoryCrossFont:
-            imageFontName = @"CGTagLabelList.bundle/blue_close";
+            imageFontName = @"CGTagLabelList.bundle/blue_close.png";
             break;
         default:
             imageFontName = nil;
@@ -485,6 +504,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.label.font = [UIFont fontWithName:@"HelveticaNeue" size:LABEL_FONT_SIZE];
         [self addSubview:self.label];
     }
+    self.label.text = text;
     
     if(type == GCTagLabelAccessoryNone) {
         [self.accessoryButton removeFromSuperview];
@@ -500,59 +520,6 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.accessoryButton.imageView.contentMode = UIViewContentModeCenter;
         [self addSubview:self.accessoryButton];
     }
-    
-    CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:LABEL_FONT_SIZE]
-                       constrainedToSize:self.fitSize
-                           lineBreakMode:NSLineBreakByWordWrapping];
-    textSize.height += VERTICAL_PADDING * 2;
-    //===========
-    CGFloat deviationValue = type != GCTagLabelAccessoryNone ? 24 : 0;
-    BOOL needCorrection =( (textSize.width + deviationValue + HORIZONTAL_PADDING * 2) > self.maxWidth );
-    if(needCorrection) {
-        textSize.width = self.maxWidth - HORIZONTAL_PADDING * 2 - deviationValue ;
-    }
-    
-    
-    CGRect labelFrame;
-    labelFrame.origin = CGPointMake(HORIZONTAL_PADDING, 0);
-    
-    if(type != GCTagLabelAccessoryNone) {
-        CGPoint buttonPoint = CGPointZero;
-        
-        buttonPoint.x = textSize.width + HORIZONTAL_PADDING;
-        if(!needCorrection)
-            buttonPoint.x -= 9;
-        buttonPoint.y = (textSize.height - 24) / 2 ;
-        
-        CGRect buttonFrame = self.accessoryButton.frame;
-        buttonFrame.origin = buttonPoint;
-        self.accessoryButton.frame = buttonFrame;
-    }
-    labelFrame.size = textSize;
-    self.label.textAlignment = needCorrection ? UITextAlignmentLeft : UITextAlignmentCenter;
-    self.label.frame = labelFrame;
-    self.label.text = text;
-    
-    CGFloat viewWidth;
-    if(self.accessoryButton)
-        viewWidth = self.accessoryButton.frame.origin.x + CGRectGetWidth(self.accessoryButton.frame);
-    else
-        viewWidth = self.label.frame.origin.x + CGRectGetWidth(self.label.frame);
-    
-    viewWidth += HORIZONTAL_PADDING;
-    //===========
-    CGRect viewFrame = CGRectZero;
-    viewFrame.size.width = viewWidth;
-    viewFrame.size.height = textSize.height;
-    self.frame = viewFrame;
-    
-    [CATransaction begin];
-    [CATransaction setValue:(id)kCFBooleanTrue
-                     forKey:kCATransactionDisableActions];
-    self.gradientLayer.frame = self.bounds;
-    self.gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], (id)[self.labelBackgroundColor CGColor], nil];
-    self.gradientLayer.borderColor = self.labelBackgroundColor.CGColor;
-    [CATransaction commit];
 }
 
 - (NSString*)reuseIdentifier {
@@ -580,6 +547,117 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.gradientLayer.colors = colorsArray;
         [CATransaction commit];
     }
+}
+
+- (void)didMoveToSuperview {
+    if(![self.superview isKindOfClass:[GCTagList class]]) {
+        CGRect rect = self.frame;
+        [self resizeLabel];
+        CGRect frame = self.frame;
+        frame.origin = rect.origin;
+        self.frame = frame;
+    }
+}
+
+@end
+
+@implementation GCTagLabel (Private)
++ (CGRect)rectangleOfTagLabelWithText:(NSString*)textStr
+                             maxWidth:(CGFloat)maxWidth
+                        accessoryType:(GCTagLabelAccessoryType)type {
+    CGSize textSize = [textStr sizeWithFont:[UIFont systemFontOfSize:LabelDefaultFontSize]
+                          constrainedToSize:CGSizeMake(9999, 9999)
+                              lineBreakMode:NSLineBreakByWordWrapping];
+    
+    CGFloat deviationValue = type != GCTagLabelAccessoryNone ? 24 : 0;
+    BOOL needCorrection =( (textSize.width + deviationValue + LabelHorizontalPadding * 2) > maxWidth );
+    if(needCorrection) {
+        textSize.width = maxWidth - LabelHorizontalPadding * 2 - deviationValue ;
+    }
+    
+    
+    CGRect labelFrame;
+    labelFrame.origin = CGPointMake(LabelHorizontalPadding, 0);
+    CGRect buttonFrame = CGRectZero;
+    if(type != GCTagLabelAccessoryNone) {
+        CGPoint buttonPoint = CGPointZero;
+        
+        buttonPoint.x = textSize.width + LabelHorizontalPadding;
+        if(!needCorrection)
+            buttonPoint.x -= 9;
+        buttonPoint.y = (textSize.height - 24) / 2 ;
+        
+        buttonFrame = CGRectMake(0, 0, 24, 24);
+        buttonFrame.origin = buttonPoint;
+    }
+    labelFrame.size = textSize;
+    
+    CGFloat viewWidth;
+    if(!CGRectEqualToRect(buttonFrame, CGRectZero))
+        viewWidth = buttonFrame.origin.x + CGRectGetWidth(buttonFrame);
+    else
+        viewWidth = labelFrame.origin.x + CGRectGetWidth(labelFrame);
+    
+    viewWidth += LabelHorizontalPadding;
+    //===========
+    CGRect viewFrame = CGRectZero;
+    viewFrame.size.width = viewWidth;
+    viewFrame.size.height = textSize.height;
+    return viewFrame;
+}
+
+- (void)resizeLabel {
+    CGSize textSize = [self.label.text sizeWithFont:[UIFont systemFontOfSize:LABEL_FONT_SIZE]
+                       constrainedToSize:self.fitSize
+                           lineBreakMode:NSLineBreakByWordWrapping];
+    textSize.height += VERTICAL_PADDING * 2;
+    //===========
+    CGFloat deviationValue = self.accessoryType != GCTagLabelAccessoryNone ? 24 : 0;
+    BOOL needCorrection =( (textSize.width + deviationValue + HORIZONTAL_PADDING * 2) > self.maxWidth );
+    if(needCorrection) {
+        textSize.width = self.maxWidth - HORIZONTAL_PADDING * 2 - deviationValue ;
+    }
+    
+    
+    CGRect labelFrame;
+    labelFrame.origin = CGPointMake(HORIZONTAL_PADDING, 0);
+    
+    if(self.accessoryType != GCTagLabelAccessoryNone) {
+        CGPoint buttonPoint = CGPointZero;
+        
+        buttonPoint.x = textSize.width + HORIZONTAL_PADDING;
+        if(!needCorrection)
+            buttonPoint.x -= 9;
+        buttonPoint.y = (textSize.height - 24) / 2 ;
+        
+        CGRect buttonFrame = self.accessoryButton.frame;
+        buttonFrame.origin = buttonPoint;
+        self.accessoryButton.frame = buttonFrame;
+    }
+    labelFrame.size = textSize;
+    self.label.textAlignment = needCorrection ? UITextAlignmentLeft : UITextAlignmentCenter;
+    self.label.frame = labelFrame;
+    
+    CGFloat viewWidth;
+    if(self.accessoryButton)
+        viewWidth = self.accessoryButton.frame.origin.x + CGRectGetWidth(self.accessoryButton.frame);
+    else
+        viewWidth = self.label.frame.origin.x + CGRectGetWidth(self.label.frame);
+    
+    viewWidth += HORIZONTAL_PADDING;
+    //===========
+    CGRect viewFrame = CGRectZero;
+    viewFrame.size.width = viewWidth;
+    viewFrame.size.height = textSize.height;
+    self.frame = viewFrame;
+    
+    [CATransaction begin];
+    [CATransaction setValue:(id)kCFBooleanTrue
+                     forKey:kCATransactionDisableActions];
+    self.gradientLayer.frame = self.bounds;
+    self.gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], (id)[self.labelBackgroundColor CGColor], nil];
+    self.gradientLayer.borderColor = self.labelBackgroundColor.CGColor;
+    [CATransaction commit];
 }
 
 @end

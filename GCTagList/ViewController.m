@@ -12,7 +12,7 @@
 
 #define ARY @[@"Mark Wu", @"Green Chiu", @"Eikiy Chang", @"Gina Sun", @"Jeremy Chang", @"Sandra Hsu"]
 
-@interface ViewController () <GCTagLabelListDataSource, GCTagLabelListDelegate>
+@interface ViewController () <GCTagListDataSource, GCTagListDelegate>
 @property (nonatomic, retain) NSMutableArray* tagNames;
 @end
 
@@ -24,7 +24,7 @@
     self.tagNames = [NSMutableArray arrayWithArray:ARY];
     
     GCTagLabel* tagLabel0 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
-    [tagLabel0 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryNone];
+    [tagLabel0 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryArrowFont];
     [self.view addSubview:tagLabel0];
     
     GCTagLabel* tagLabel1 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
@@ -60,7 +60,7 @@
     GCTagLabel* tag = [tagList dequeueReusableTagLabelWithIdentifier:identifier];
     if(!tag) {
         tag = [GCTagLabel tagLabelWithReuseIdentifier:identifier];
-        tag.selectedEnabled = NO;
+//        tag.selectedEnabled = NO;
         tag.labelBackgroundColor = [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f];
     }
     
@@ -72,9 +72,9 @@
     return tag;
 }
 
-//- (void)tagList:(GCTagList *)tagList accessoryButtonTappedAtIndex:(NSInteger)index {
-//    NSLog(@"%s", __func__);
-//}
+- (void)tagList:(GCTagList *)tagList accessoryButtonTappedAtIndex:(NSInteger)index {
+    NSLog(@"%s", __func__);
+}
 
 - (void)tagList:(GCTagList *)taglist didChangedHeight:(CGFloat)newHeight {
     NSLog(@"%s:%.1f", __func__, newHeight);

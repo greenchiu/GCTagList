@@ -41,8 +41,6 @@
 		18A0780016DE07F8005CBA7A /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		18A0780316DE07F8005CBA7A /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		18A0780B16DE08D3005CBA7A /* CGTagLabelList.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CGTagLabelList.bundle; sourceTree = "<group>"; };
-		18A0780D16DE08D3005CBA7A /* GCTagLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCTagLabel.h; sourceTree = "<group>"; };
-		18A0780E16DE08D3005CBA7A /* GCTagLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCTagLabel.m; sourceTree = "<group>"; };
 		18A0780F16DE08D3005CBA7A /* GCTagList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCTagList.h; sourceTree = "<group>"; };
 		18A0781016DE08D3005CBA7A /* GCTagList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCTagList.m; sourceTree = "<group>"; };
 		18A0781416DE0966005CBA7A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -131,8 +129,6 @@
 		18A0780C16DE08D3005CBA7A /* classes */ = {
 			isa = PBXGroup;
 			children = (
-				18A0780D16DE08D3005CBA7A /* GCTagLabel.h */,
-				18A0780E16DE08D3005CBA7A /* GCTagLabel.m */,
 				18A0780F16DE08D3005CBA7A /* GCTagList.h */,
 				18A0781016DE08D3005CBA7A /* GCTagList.m */,
 			);
