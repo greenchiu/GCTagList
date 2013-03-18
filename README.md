@@ -8,13 +8,18 @@ GCTagList like iOS Mail app's sender or recivers tags.
 ##Installation
 Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`.
 
+##What's new
+
+* support MaxRow
+* TagLabel could set not show selectedState. (selectedEnabled)
+
 ##Supports
 
 * ARC
 * iOS 5 -
 
 ##How to use
-implementation the GCTagLabelListDataSource and call the public method `reloadData`  
+implementation the GCTagListDataSource and call the public method `reloadData`  
 
 ```Objective-C   
 -(void)viewDidLoad {
@@ -54,32 +59,58 @@ implementation the GCTagLabelListDataSource and call the public method `reloadDa
 
 ```Objective-C   
 /**
- * after reloadData, if the height of TagLabelList has changed, will call this method.  
+ * 在reloadData, 如果TagList的高度有改變, 這個Mehtod會被觸發.
+ * after reloadData, if the height of TagList has changed, will call this method.
  */
 - (void)tagList:(GCTagList *)taglist didChangedHeight:(CGFloat)newHeight;
 
 /**
+ * 當點選TagLabel, 這個Method會被觸發.
  * Tapped the TagLabel, will call this mehtod.
  */
 - (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index;
 
 /**
+ * 點擊TagLabel's accessoryButton, 這個Method會被觸發.
  * Tapped the TagLabel's accessoryButton, will call this mehtod.
  */
 - (void)tagList:(GCTagList *)tagList accessoryButtonTappedAtIndex:(NSInteger)index;
+
+/**
+ * 如果有實作<GCTagLabelListDataSource>的maxNumberOfRowAtTagList, 且發生需省略後續的TagLabel時會被觸發.
+ * if implement protocol <GCTagLabelListDataSource> method 'maxNumberOfRowAtTagList' and the taglist's rows is more than the maxRow, this method will be call.
+ * 
+ * @retVal NSString the text for the TagLabel of theMaxRow's last one.
+ */
+- (NSString*)tagList:(GCTagList *)tagList labelTextForGroupTagLabel:(NSInteger)interruptIndex;
 ```
 
-##GCTagLabelListDataSource Protocol
+##GCTagListDataSource Protocol
 ```Objective-C   
 /**
+ * 在TagList中有多少個TagLabel.
  * how many count for taglist to display.
  */
 - (NSInteger)numberOfTagLabelInTagList:(GCTagList*)tagList;
 
 /**
+ * 在TagList中的TagLabel.
  * the taglabel At index in the taglist.
  */
 - (GCTagLabel*)tagList:(GCTagList*)tagList tagLabelAtIndex:(NSInteger)index;
+
+@optional
+/**
+ * TagList最多幾行.
+ * the max row at taglist.
+ */
+- (NSInteger)maxNumberOfRowAtTagList:(GCTagList*)tagList;
+
+/**
+ * TagList最後一行的最後一個TagLabel(Group TagLabel)的AccessoryType.
+ * accessory type of the group taglabel.
+ */
+- (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel;
 ```
 
 ##License
