@@ -78,7 +78,8 @@ implementation the GCTagListDataSource and call the public method `reloadData`
 
 /**
  * 如果有實作<GCTagLabelListDataSource>的maxNumberOfRowAtTagList, 且發生需省略後續的TagLabel時會被觸發.
- * if implement protocol <GCTagLabelListDataSource> method 'maxNumberOfRowAtTagList' and the taglist's rows is more than the maxRow, this method will be call.
+ * if implement protocol <GCTagLabelListDataSource> method 'maxNumberOfRowAtTagList' 
+ * and the taglist's rows is more than the maxRow, this method will be call.
  * 
  * @retVal NSString the text for the TagLabel of theMaxRow's last one.
  */
@@ -113,7 +114,14 @@ implementation the GCTagListDataSource and call the public method `reloadData`
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel;
 ```
 
+##Reference
+
+* [DWTagList](https://github.com/domness/DWTagList)
+
 ##License
+
+Use this control in your apps? Let me know!
+
 Copyright (c) 2013 Green Chiu, http://greenchiu.github.com/ Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ‘Software’), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
