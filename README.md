@@ -4,6 +4,7 @@ GCTagList
 GCTagList like iOS Mail app's sender or recivers tags.
 
 ![](Screenshot.png)
+![](Screenshot2.png)
 
 ##Installation
 Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`.
@@ -16,7 +17,7 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
 ##Supports
 
 * ARC
-* iOS 5 -
+* iOS 5.0 - 6.0
 
 ##How to use
 implementation the GCTagListDataSource and call the public method `reloadData`  

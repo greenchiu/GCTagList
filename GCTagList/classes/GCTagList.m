@@ -498,7 +498,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     
     if(!self.label) {
         self.label = GC_AUTORELEASE([[UILabel alloc] init]);
-        self.label.textAlignment = UITextAlignmentCenter;
+        self.label.textAlignment = 1;
         self.label.textColor = self.labelTextColor;
         self.label.backgroundColor = [UIColor clearColor];
         self.label.font = [UIFont fontWithName:@"HelveticaNeue" size:LABEL_FONT_SIZE];
@@ -635,7 +635,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.accessoryButton.frame = buttonFrame;
     }
     labelFrame.size = textSize;
-    self.label.textAlignment = needCorrection ? UITextAlignmentLeft : UITextAlignmentCenter;
+    self.label.textAlignment = needCorrection ? 0 : 1;
     self.label.frame = labelFrame;
     
     CGFloat viewWidth;
