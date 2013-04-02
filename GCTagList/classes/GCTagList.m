@@ -35,7 +35,7 @@
 - (void)dealloc {
     self.visibleSet = nil;
     self.reuseSet = nil;
-    NSLog(@"%s",__func__);
+//    NSLog(@"%s",__func__);
 #if !GC_SUPPORT_ARC
     [super dealloc];
 #endif
@@ -64,8 +64,7 @@
             [tag setSelected:NO animation:NO];
             [tempSet removeObject:tag];
             [self.reuseSet setObject:tempSet forKey:identifier];
-            NSLog(@"get reuse tag, rc:%d",[tag retainCount]);
-            NSLog(@"%@", tempSet);
+//            NSLog(@"get reuse tag, rc:%d",[tag retainCount]);
         }
     }
     return tag;
@@ -80,7 +79,7 @@
     for (GCTagLabel* tag in self.subviews) {
         [tag removeFromSuperview];
         [self addTagLabelToReuseSet:tag];
-        NSLog(@"remove tag, rc:%d %p",[tag retainCount], tag);
+//        NSLog(@"remove tag, rc:%d %p",[tag retainCount], tag);
     }
     
     
@@ -146,9 +145,6 @@
         NSLog(@"p3 get tag's rc:%d", tag.retainCount);
         //======
         [self.visibleSet addObject:tag];
-        NSLog(@"p4 get tag's rc:%d", tag.retainCount);
-        //======
-        
         preTagLabelFrame = viewFrame;
         // ============
         if(maxRow > 0 && nowRow > maxRow) {
@@ -161,22 +157,6 @@
         [set minusSet:self.visibleSet];
         [self.reuseSet setObject:set forKey:key];
     }
-//    
-////    for (GCTagLabel* tag in self.visibleSet) {
-////        NSLog(@"visible set:%d", [tag retainCount]);
-////    }
-//    
-//    NSLog(@"visible set:%@", self.visibleSet);
-//    
-//    for (NSString* key in self.reuseSet.allKeys) {
-//        NSSet* set = [self.reuseSet objectForKey:key];
-////        for (GCTagList* tag in [set allObjects]) {
-////            NSLog(@"reuse set:%d", [tag retainCount]);
-////        }
-//        NSLog(@"%@:%@", key, set);
-//    }
-//    
-//    NSLog(@"%@", [self subviews]);
     
     totalHeight = CGRectGetHeight(preTagLabelFrame) + preTagLabelFrame.origin.y;
     
@@ -492,7 +472,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 
 + (GCTagLabel*)tagLabelWithReuseIdentifier:(NSString *)identifier {
     GCTagLabel *tag = GC_AUTORELEASE([[GCTagLabel alloc] initReuseIdentifier:identifier]);
-    NSLog(@"init tag, rc:%d", [tag retainCount]);
+//    NSLog(@"init tag, rc:%d", [tag retainCount]);
     return tag;
 }
 
@@ -507,7 +487,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.accessoryButton = nil;
     self.privateReuseIdentifier = nil;
     
-    NSLog(@"%s %p",__func__, self);
+//    NSLog(@"%s %p",__func__, self);
 #if !GC_SUPPORT_ARC
     [super dealloc];
 #endif
