@@ -35,7 +35,7 @@
 - (void)dealloc {
     self.visibleSet = nil;
     self.reuseSet = nil;
-    
+    NSLog(@"%s",__func__);
 #if !GC_SUPPORT_ARC
     [super dealloc];
 #endif
@@ -59,10 +59,13 @@
     
     NSMutableSet* tempSet = (NSMutableSet*)[self.reuseSet objectForKey:identifier];
     if(tempSet) {
-        tag = [tempSet anyObject];
+        tag = GC_AUTORELEASE(GC_RETAIN([tempSet anyObject]));
         if(tag) {
             [tag setSelected:NO animation:NO];
             [tempSet removeObject:tag];
+            [self.reuseSet setObject:tempSet forKey:identifier];
+            NSLog(@"get reuse tag, rc:%d",[tag retainCount]);
+            NSLog(@"%@", tempSet);
         }
     }
     return tag;
@@ -76,16 +79,12 @@
     
     for (GCTagLabel* tag in self.subviews) {
         [tag removeFromSuperview];
-        [self.visibleSet removeObject:tag];
-        if(tag.reuseIdentifier) {
-            NSMutableSet* tempSet = self.reuseSet[tag.reuseIdentifier];
-            if(!tempSet) {
-                tempSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
-            }
-            [tempSet addObject:tag];
-            [self.reuseSet setObject:tempSet forKey:tag.reuseIdentifier];
-        }
+        [self addTagLabelToReuseSet:tag];
+        NSLog(@"remove tag, rc:%d %p",[tag retainCount], tag);
     }
+    
+    
+    
     
     NSInteger numberOfTagLabel = [self.dataSource numberOfTagLabelInTagList:self];
     
@@ -103,7 +102,8 @@
     CGRect preTagLabelFrame = CGRectZero;
     CGFloat totalHeight = 0;
     for (int i = 0; i < numberOfTagLabel; i++) {
-        GCTagLabel* tag = [self.dataSource tagList:self tagLabelAtIndex:i];
+        GCTagLabel* tag = (([self.dataSource tagList:self tagLabelAtIndex:i]));
+        NSLog(@"p1 get tag's rc:%d", tag.retainCount);
         //=======
         tag.maxWidth = CGRectGetWidth(self.frame);
         [tag resizeLabel];
@@ -121,6 +121,8 @@
             if(CGRectGetWidth(preTagLabelFrame) > 0.f && maxRow > 0) {
                 nowRow ++;
                 if(nowRow > maxRow)  {
+                    [self addTagLabelToReuseSet:tag];
+                    tag = nil;
                     tag = [self tagLabelForInterruptIndex:i preTagFrame:preTagLabelFrame];
                     viewFrame = tag.frame;
                 } else {
@@ -138,11 +140,13 @@
             viewFrame.origin = CGPointMake(leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + labelMargin ,
                                            preTagLabelFrame.origin.y);
         }
-        
+        NSLog(@"p2 get tag's rc:%d", tag.retainCount);
         tag.frame = viewFrame;
         [self addSubview:tag];
+        NSLog(@"p3 get tag's rc:%d", tag.retainCount);
         //======
         [self.visibleSet addObject:tag];
+        NSLog(@"p4 get tag's rc:%d", tag.retainCount);
         //======
         
         preTagLabelFrame = viewFrame;
@@ -151,6 +155,29 @@
             break;
         }
     }
+    
+    for (NSString* key in [self.reuseSet allKeys]) {
+        NSMutableSet *set = [self.reuseSet objectForKey:key];
+        [set minusSet:self.visibleSet];
+        [self.reuseSet setObject:set forKey:key];
+    }
+//    
+////    for (GCTagLabel* tag in self.visibleSet) {
+////        NSLog(@"visible set:%d", [tag retainCount]);
+////    }
+//    
+//    NSLog(@"visible set:%@", self.visibleSet);
+//    
+//    for (NSString* key in self.reuseSet.allKeys) {
+//        NSSet* set = [self.reuseSet objectForKey:key];
+////        for (GCTagList* tag in [set allObjects]) {
+////            NSLog(@"reuse set:%d", [tag retainCount]);
+////        }
+//        NSLog(@"%@:%@", key, set);
+//    }
+//    
+//    NSLog(@"%@", [self subviews]);
+    
     totalHeight = CGRectGetHeight(preTagLabelFrame) + preTagLabelFrame.origin.y;
     
     if(CGRectGetHeight(self.frame) == totalHeight)
@@ -186,6 +213,20 @@
 
 #pragma mark -
 #pragma mark Private
+
+- (void)addTagLabelToReuseSet:(GCTagLabel*)tag {
+    if(tag.reuseIdentifier) {
+        NSString* string = [NSString stringWithString:tag.reuseIdentifier];
+        NSMutableSet* tempSet = self.reuseSet[string];
+        if(!tempSet) {
+            tempSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
+        }
+        [tempSet addObject:tag];
+        [self.visibleSet minusSet:tempSet];
+        [self.reuseSet setObject:tempSet forKey:string];
+    }
+}
+
 - (void)handleTouchUpInsideTagAccessoryButton:(id)sender {
     if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:accessoryButtonTappedAtIndex:)]) {
         NSInteger index = [[(GCTagLabel*)[sender superview] valueForKeyPath:@"index"] integerValue];
@@ -235,15 +276,9 @@
         float last_width = leftMargin + rect.origin.x + rect.size.width +
         CGRectGetWidth(tempRect) + leftMargin;
         if (last_width > self.rowMaxWidth) {
-            if(tag.reuseIdentifier) {
-                NSMutableSet* tempSet = self.reuseSet[tag.reuseIdentifier];
-                if(!tempSet) {
-                    tempSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
-                }
-                [tempSet addObject:tag];
-                [self.reuseSet setObject:tempSet forKey:tag.reuseIdentifier];
-            }
+            [self addTagLabelToReuseSet:tag];
             [tag removeFromSuperview];
+            tag = nil;
             continue;
         }
         rect = tag.frame;
@@ -456,7 +491,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 @implementation GCTagLabel
 
 + (GCTagLabel*)tagLabelWithReuseIdentifier:(NSString *)identifier {
-    return GC_AUTORELEASE([[GCTagLabel alloc] initReuseIdentifier:identifier]);
+    GCTagLabel *tag = GC_AUTORELEASE([[GCTagLabel alloc] initReuseIdentifier:identifier]);
+    NSLog(@"init tag, rc:%d", [tag retainCount]);
+    return tag;
 }
 
 - (void)dealloc {
@@ -469,6 +506,8 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.label = nil;
     self.accessoryButton = nil;
     self.privateReuseIdentifier = nil;
+    
+    NSLog(@"%s %p",__func__, self);
 #if !GC_SUPPORT_ARC
     [super dealloc];
 #endif
