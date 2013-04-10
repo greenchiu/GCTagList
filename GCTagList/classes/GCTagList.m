@@ -17,7 +17,6 @@
                         accessoryType:(GCTagLabelAccessoryType)type;
 
 - (void)resizeLabel;
-
 @end
 
 @interface GCTagList ()
@@ -35,7 +34,6 @@
 - (void)dealloc {
     self.visibleSet = nil;
     self.reuseSet = nil;
-//    NSLog(@"%s",__func__);
 #if !GC_SUPPORT_ARC
     [super dealloc];
 #endif
@@ -64,7 +62,6 @@
             [tag setSelected:NO animation:NO];
             [tempSet removeObject:tag];
             [self.reuseSet setObject:tempSet forKey:identifier];
-//            NSLog(@"get reuse tag, rc:%d",[tag retainCount]);
         }
     }
     return tag;
@@ -79,7 +76,6 @@
     for (GCTagLabel* tag in self.subviews) {
         [tag removeFromSuperview];
         [self addTagLabelToReuseSet:tag];
-//        NSLog(@"remove tag, rc:%d %p",[tag retainCount], tag);
     }
     
     
@@ -102,7 +98,6 @@
     CGFloat totalHeight = 0;
     for (int i = 0; i < numberOfTagLabel; i++) {
         GCTagLabel* tag = (([self.dataSource tagList:self tagLabelAtIndex:i]));
-        NSLog(@"p1 get tag's rc:%d", tag.retainCount);
         //=======
         tag.maxWidth = CGRectGetWidth(self.frame);
         [tag resizeLabel];
@@ -139,10 +134,8 @@
             viewFrame.origin = CGPointMake(leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + labelMargin ,
                                            preTagLabelFrame.origin.y);
         }
-        NSLog(@"p2 get tag's rc:%d", tag.retainCount);
         tag.frame = viewFrame;
         [self addSubview:tag];
-        NSLog(@"p3 get tag's rc:%d", tag.retainCount);
         //======
         [self.visibleSet addObject:tag];
         preTagLabelFrame = viewFrame;
@@ -183,6 +176,19 @@
     }
 }
 
+- (GCTagLabel*)tagLabelAtIndex:(NSInteger)index {
+    GCTagLabel* tagLabel = nil;
+    for (GCTagLabel* tempLabel in [self.visibleSet allObjects]) {
+        NSInteger indexForTagLabel = [[tempLabel valueForKeyPath:@"index"] integerValue];
+        if(index == indexForTagLabel) {
+            tagLabel = tempLabel;
+            break;
+        }
+    }
+    return tagLabel;
+}
+
+#pragma mark - override
 - (UIView*)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     UIView* temp = [super hitTest:point withEvent:event];
     if(temp == self) {
@@ -207,23 +213,12 @@
     }
 }
 
-- (void)handleTouchUpInsideTagAccessoryButton:(id)sender {
+- (void)handleTouchUpInsideTagAccessoryButton:(UIButton*)sender {
     if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:accessoryButtonTappedAtIndex:)]) {
+        sender.highlighted = NO;
         NSInteger index = [[(GCTagLabel*)[sender superview] valueForKeyPath:@"index"] integerValue];
         [self.delegate tagList:self accessoryButtonTappedAtIndex:index];
     }
-}
-
-- (GCTagLabel*)tagLabelAtIndex:(NSInteger)index {
-    GCTagLabel* tagLabel = nil;
-    for (GCTagLabel* tempLabel in [self.visibleSet allObjects]) {
-        NSInteger indexForTagLabel = [[tempLabel valueForKeyPath:@"index"] integerValue];
-        if(index == indexForTagLabel) {
-            tagLabel = tempLabel;
-            break;
-        }
-    }
-    return tagLabel;
 }
 
 - (GCTagLabel*)tagLabelForInterruptIndex:(NSInteger)startIndex
@@ -277,7 +272,7 @@
 - (void)addTappedTarget:(GCTagLabel*)tag {
     if(tag.accessoryType != GCTagLabelAccessoryNone) {
         UIButton* accessoryButton = [tag valueForKeyPath:@"accessoryButton"];
-        
+        accessoryButton.enabled = YES;
         if(accessoryButton.allTargets.count == 0) {
             [accessoryButton addTarget:self
                                 action:@selector(handleTouchUpInsideTagAccessoryButton:)
@@ -472,7 +467,6 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 
 + (GCTagLabel*)tagLabelWithReuseIdentifier:(NSString *)identifier {
     GCTagLabel *tag = GC_AUTORELEASE([[GCTagLabel alloc] initReuseIdentifier:identifier]);
-//    NSLog(@"init tag, rc:%d", [tag retainCount]);
     return tag;
 }
 
@@ -486,8 +480,6 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.label = nil;
     self.accessoryButton = nil;
     self.privateReuseIdentifier = nil;
-    
-//    NSLog(@"%s %p",__func__, self);
 #if !GC_SUPPORT_ARC
     [super dealloc];
 #endif
@@ -626,7 +618,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 }
 
 - (void)resizeLabel {
-    CGSize textSize = [self.label.text sizeWithFont:[UIFont systemFontOfSize:LABEL_FONT_SIZE]
+    CGSize textSize = [self.label.text sizeWithFont:self.label.font
                        constrainedToSize:self.fitSize
                            lineBreakMode:NSLineBreakByWordWrapping];
     textSize.height += VERTICAL_PADDING * 2;

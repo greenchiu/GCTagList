@@ -36,11 +36,11 @@
     tagLabel1.frame = frame;
     [self.view addSubview:tagLabel1];
     
-    NSLog(@"heightOfRows:[%d rows]:[%.1f]",2, [GCTagList heightOfRows:1]);
+//    NSLog(@"heightOfRows:[%d rows]:[%.1f]",2, [GCTagList heightOfRows:1]);
     
     
     GCTagList* taglist = [[[GCTagList alloc] initWithFrame:CGRectMake(0, 180, 320, 200)] autorelease];
-    taglist.firstRowLeftMargin = 80.f;
+//    taglist.firstRowLeftMargin = 80.f;
     taglist.delegate = self;
     taglist.dataSource = self;
     [self.view addSubview:taglist];
@@ -65,7 +65,7 @@
     }
     
     NSString* labelText = self.tagNames[index];
-    GCTagLabelAccessoryType type = GCTagLabelAccessoryNone;
+    GCTagLabelAccessoryType type = GCTagLabelAccessoryCrossFont;
     [tag setLabelText:labelText
         accessoryType:type];
     
@@ -73,7 +73,9 @@
 }
 
 - (void)tagList:(GCTagList *)tagList accessoryButtonTappedAtIndex:(NSInteger)index {
-    NSLog(@"%s", __func__);
+//    NSLog(@"%s", __func__);
+    [self.tagNames removeObjectAtIndex:index];
+    [tagList reloadData];
 }
 
 - (void)tagList:(GCTagList *)taglist didChangedHeight:(CGFloat)newHeight {
@@ -84,14 +86,14 @@
     return [NSString stringWithFormat:@"和其他%d位", self.tagNames.count - interruptIndex];
 }
 
-//- (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index {
-//    NSLog(@"%s", __func__);
-//}
+- (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index {
+    NSLog(@"%.0f", [taglist tagLabelAtIndex:index].maxWidth);
+}
 
 //
 
 - (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList {
-    return 1;
+    return 3;
 }
 //
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel {
