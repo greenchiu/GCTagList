@@ -130,6 +130,12 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 - (GCTagLabel*)dequeueReusableTagLabelWithIdentifier:(NSString*)identifier;
 
 /**
+ * 取得taglist第index位置上的taglabel
+ * get taglabel at index of the taglist.
+ */
+- (GCTagLabel*)tagLabelAtIndex:(NSInteger)index;
+
+/**
  * 載入TagLabel並顯示TagList.
  * show taglist's taglabel.
  */
@@ -141,8 +147,20 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
  */
 - (void)deselectedLabelAtIndex:(NSInteger)index animated:(BOOL)animated;
 
-- (GCTagLabel*)tagLabelAtIndex:(NSInteger)index;
+/**
+ *
+ */
+- (void)reloadTagLabelWithRange:(NSRange)range;
 
+/**
+ *
+ */
+- (void)deleteTagLabelWithRange:(NSRange)range;
+
+/**
+ *
+ */
+- (void)insertTagLabelWithRagne:(NSRange)range;
 @end
 
 @interface GCTagList (AbstractHeight)

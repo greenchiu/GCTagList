@@ -18,7 +18,7 @@
 		18A077FE16DE07F8005CBA7A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 18A077FD16DE07F8005CBA7A /* Default-568h@2x.png */; };
 		18A0780116DE07F8005CBA7A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0780016DE07F8005CBA7A /* ViewController.m */; };
 		18A0780416DE07F8005CBA7A /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18A0780216DE07F8005CBA7A /* ViewController.xib */; };
-		18A0781116DE08D3005CBA7A /* CGTagLabelList.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 18A0780B16DE08D3005CBA7A /* CGTagLabelList.bundle */; };
+		18A0781116DE08D3005CBA7A /* CGTagList.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 18A0780B16DE08D3005CBA7A /* CGTagList.bundle */; };
 		18A0781316DE08D3005CBA7A /* GCTagList.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0781016DE08D3005CBA7A /* GCTagList.m */; };
 		18A0781516DE0966005CBA7A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18A0781416DE0966005CBA7A /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
@@ -40,7 +40,7 @@
 		18A077FF16DE07F8005CBA7A /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		18A0780016DE07F8005CBA7A /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		18A0780316DE07F8005CBA7A /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
-		18A0780B16DE08D3005CBA7A /* CGTagLabelList.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CGTagLabelList.bundle; sourceTree = "<group>"; };
+		18A0780B16DE08D3005CBA7A /* CGTagList.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CGTagList.bundle; sourceTree = "<group>"; };
 		18A0780F16DE08D3005CBA7A /* GCTagList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCTagList.h; sourceTree = "<group>"; };
 		18A0781016DE08D3005CBA7A /* GCTagList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCTagList.m; sourceTree = "<group>"; };
 		18A0781416DE0966005CBA7A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -121,7 +121,7 @@
 		18A0780A16DE08D3005CBA7A /* assets */ = {
 			isa = PBXGroup;
 			children = (
-				18A0780B16DE08D3005CBA7A /* CGTagLabelList.bundle */,
+				18A0780B16DE08D3005CBA7A /* CGTagList.bundle */,
 			);
 			path = assets;
 			sourceTree = "<group>";
@@ -191,7 +191,7 @@
 				18A077FC16DE07F8005CBA7A /* Default@2x.png in Resources */,
 				18A077FE16DE07F8005CBA7A /* Default-568h@2x.png in Resources */,
 				18A0780416DE07F8005CBA7A /* ViewController.xib in Resources */,
-				18A0781116DE08D3005CBA7A /* CGTagLabelList.bundle in Resources */,
+				18A0781116DE08D3005CBA7A /* CGTagList.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -93,7 +93,7 @@
 //
 
 - (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList {
-    return 3;
+    return 1;
 }
 //
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel {
