@@ -40,12 +40,34 @@
 #endif
 }
 
+- (void)awakeFromNib {
+    self.rowMaxWidth = CGRectGetWidth(self.frame);
+    self.nowSelected = NSNotFound;
+    self.firstRowLeftMargin = 0.f;
+    self.backgroundColor = [UIColor clearColor];
+    self.visibleSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
+    self.reuseSet = GC_AUTORELEASE([[NSMutableDictionary alloc] init]);
+}
+
+- (id)init {
+    self = [super init];
+    if(self) {
+        self.nowSelected = NSNotFound;
+        self.firstRowLeftMargin = 0.f;
+        self.rowMaxWidth = 0.f;
+        self.backgroundColor = [UIColor clearColor];
+        self.visibleSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
+        self.reuseSet = GC_AUTORELEASE([[NSMutableDictionary alloc] init]);
+    }
+    return self;
+}
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.rowMaxWidth = CGRectGetWidth(frame);
         self.nowSelected = NSNotFound;
         self.firstRowLeftMargin = 0.f;
-        self.rowMaxWidth = CGRectGetWidth(frame);
         self.backgroundColor = [UIColor clearColor];
         self.visibleSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
         self.reuseSet = GC_AUTORELEASE([[NSMutableDictionary alloc] init]);
@@ -110,6 +132,16 @@
        ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
        ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
         return;
+    
+    for (int i = range.location; i < range.length; i++) {
+        GCTagLabel* tag = [self tagLabelAtIndex:i];
+        if(tag) {
+            [tag removeFromSuperview];
+            [self addTagLabelToReuseSet:tag];
+        }
+    }
+    
+    [self layoutTagLabelsWithRange:range];
 }
 
 - (void)deleteTagLabelWithRange:(NSRange)range {
@@ -117,6 +149,21 @@
        ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
        ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
         return;
+    
+    for (int i = range.location; i < range.length; i++) {
+        GCTagLabel* tag = [self tagLabelAtIndex:i];
+        if(tag) {
+            [tag removeFromSuperview];
+            [self addTagLabelToReuseSet:tag];
+        }
+    }
+    
+    NSInteger totalCount = [self.dataSource numberOfTagLabelInTagList:self];
+    NSRange reloadRange = NSMakeRange(range.location, totalCount - range.location);
+    if (reloadRange.length == 0)
+        return;
+
+    [self layoutTagLabelsWithRange:reloadRange];
 }
 
 - (void)insertTagLabelWithRagne:(NSRange)range {
@@ -152,7 +199,6 @@
 
 - (void)handleTouchUpInsideTagAccessoryButton:(UIButton*)sender {
     if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:accessoryButtonTappedAtIndex:)]) {
-        sender.highlighted = NO;
         NSInteger index = [[(GCTagLabel*)[sender superview] valueForKeyPath:@"index"] integerValue];
         [self.delegate tagList:self accessoryButtonTappedAtIndex:index];
     }
@@ -209,7 +255,6 @@
 - (void)addTappedTarget:(GCTagLabel*)tag {
     if(tag.accessoryType != GCTagLabelAccessoryNone) {
         UIButton* accessoryButton = [tag valueForKeyPath:@"accessoryButton"];
-        accessoryButton.enabled = YES;
         if(accessoryButton.allTargets.count == 0) {
             [accessoryButton addTarget:self
                                 action:@selector(handleTouchUpInsideTagAccessoryButton:)
@@ -244,9 +289,13 @@
     CGFloat totalHeight = 0;
     for (int i = startIndex; i < endIndex; i++) {
         GCTagLabel* tag = (([self.dataSource tagList:self tagLabelAtIndex:i]));
-        tag.maxWidth = CGRectGetWidth(self.frame);
+        
+        if(tag.maxWidthFitToListWidth)
+            tag.maxWidth = CGRectGetWidth(self.frame);
+        
         [tag resizeLabel];
         [tag setValue:[NSString stringWithFormat:@"%d",i] forKeyPath:@"index"];
+        
         [self addTappedTarget:tag];
         CGRect viewFrame = tag.frame;
         CGFloat leftMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? self.firstRowLeftMargin : 0;
@@ -285,6 +334,7 @@
             break;
         }
     }
+    
     
     for (NSString* key in [self.reuseSet allKeys]) {
         NSMutableSet *set = [self.reuseSet objectForKey:key];
@@ -519,6 +569,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     if(self) {
         _selected = NO;
         self.maxWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
+        self.maxWidthFitToListWidth = YES;
         self.selectedEnabled = YES;
         self.privateReuseIdentifier = identifier;
         self.fitSize = CGSizeMake(self.maxWidth, 1500);

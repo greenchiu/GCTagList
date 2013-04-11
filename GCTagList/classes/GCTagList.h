@@ -203,6 +203,12 @@ extern CGFloat const LabelVerticalPadding;
 @property (assign) CGSize fitSize;
 
 /**
+ * let the maxWidth equal to the taglist's width,
+ * default is YES.
+ */
+@property (assign) BOOL maxWidthFitToListWidth;
+
+/**
  * Limit TagLabel's max width, default is CGRectGetWidth([UIScreen mainScreen].bounds)
  */
 @property (assign) CGFloat maxWidth;

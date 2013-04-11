@@ -8,7 +8,6 @@
 
 #import "ViewController.h"
 #import "GCTagList.h"
-//#import "GCTagLabel.h"
 
 #define ARY @[@"Mark Wu", @"Green Chiu", @"Eikiy Chang", @"Gina Sun", @"Jeremy Chang", @"Sandra Hsu"]
 
@@ -60,7 +59,6 @@
     GCTagLabel* tag = [tagList dequeueReusableTagLabelWithIdentifier:identifier];
     if(!tag) {
         tag = [GCTagLabel tagLabelWithReuseIdentifier:identifier];
-//        tag.selectedEnabled = NO;
         tag.labelBackgroundColor = [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f];
     }
     
@@ -86,9 +84,9 @@
     return [NSString stringWithFormat:@"和其他%d位", self.tagNames.count - interruptIndex];
 }
 
-- (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index {
-    NSLog(@"%.0f", [taglist tagLabelAtIndex:index].maxWidth);
-}
+//- (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index {
+//    NSLog(@"%.0f", [taglist tagLabelAtIndex:index].maxWidth);
+//}
 
 //
 

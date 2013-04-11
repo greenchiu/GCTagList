@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "GCTagList.h"
 
 @interface ViewController : UIViewController
-
+@property (nonatomic, strong) IBOutlet GCTagList *nibTagList;
 @end
