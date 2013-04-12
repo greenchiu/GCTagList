@@ -16,9 +16,14 @@
 @interface GCTagLabel (Private)
 + (CGRect)rectangleOfTagLabelWithText:(NSString*)textStr
                              maxWidth:(CGFloat)maxWidth
+                        accessoryType:(GCTagLabelAccessoryType)type __deprecated;
+
++ (CGRect)rectangleOfTagLabelWithText:(NSString*)textStr
+                        labelMaxWidth:(CGFloat)maxWidth
+                            labelFont:(UIFont*)font
                         accessoryType:(GCTagLabelAccessoryType)type;
 
-- (void)resizeLabel;
+- (void)reSizeLabel;
 @end
 
 @interface GCTagList ()
@@ -173,9 +178,16 @@
     }
     
     
-//    NSInteger totalCount = [self.dataSource numberOfTagLabelInTagList:self];
+    NSInteger totalCount = [self.dataSource numberOfTagLabelInTagList:self];
 //    NSLog(@"%d", totalCount);
-//    NSRange reloadRange = NSMakeRange(range.location, totalCount - range.location);
+    NSRange reloadRange = NSMakeRange(range.location, totalCount - range.location);
+    NSInteger maxRow = 0, nowRow = [self rowOfLabelAtIndex:range.location-1];
+    if([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
+        maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
+    }
+    [self layoutAndGetLastFrameWithStartIndex:reloadRange
+                                     rowRange:NSMakeRange(nowRow, maxRow)];
+    
 //    if (reloadRange.length == 0)
 //        return;
 //
@@ -235,7 +247,6 @@
             continue;
         
         rect = (i-1)>=0 ? [self tagLabelAtIndex:(i-1)].frame : CGRectZero;
-//        CGFloat leftMargin = CGRectGetWidth(rect) == 0.f ? self.firstRowLeftMargin : 0;
         NSString* tempText;
         if([self.delegate respondsToSelector:@selector(tagList:labelTextForGroupTagLabel:)]) {
             tempText = [self.delegate tagList:self labelTextForGroupTagLabel:i];
@@ -244,13 +255,11 @@
         }
         
         CGRect tempRect = [GCTagLabel rectangleOfTagLabelWithText:tempText
-                                                         maxWidth:tag.maxWidth
+                                                    labelMaxWidth:tag.maxWidth
+                                                        labelFont:[tag valueForKeyPath:@"label.font"]
                                                     accessoryType:groupType];
         
-        BOOL isNeedGoNextRow = [self isNeedGoNextRowWidthFrame:tempRect preFrame:rect];
-//        float last_width = leftMargin + rect.origin.x + rect.size.width +
-//        CGRectGetWidth(tempRect) + leftMargin;
-//        if (last_width > self.rowMaxWidth) {
+        BOOL isNeedGoNextRow = [self needsGoToTheNextRowWidthFrame:tempRect preFrame:rect];
         if (isNeedGoNextRow) {
             [self addTagLabelToReuseSet:tag];
             [tag removeFromSuperview];
@@ -259,7 +268,7 @@
         }
         rect = tag.frame;
         [tag setLabelText:tempText accessoryType:groupType];
-        [tag resizeLabel];
+        [tag reSizeLabel];
         [self addTappedTarget:tag];
         
         CGRect frame = tag.frame;
@@ -311,21 +320,18 @@
         if(tag.maxWidthFitToListWidth)
             tag.maxWidth = CGRectGetWidth(self.frame);
         
-        [tag resizeLabel];
+        [tag reSizeLabel];
         [tag setValue:[NSString stringWithFormat:@"%d",i] forKeyPath:@"index"];
         
         [self addTappedTarget:tag];
         CGRect viewFrame = tag.frame;
         
-        BOOL isNeedGoNextRow = [self isNeedGoNextRowWidthFrame:viewFrame
-                                                      preFrame:preTagLabelFrame];
+        BOOL needsGoNextRow = [self needsGoToTheNextRowWidthFrame:viewFrame
+                                                          preFrame:preTagLabelFrame];
         
         CGFloat leftMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? self.firstRowLeftMargin : 0;
         CGFloat labelMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? 0 : LABEL_MARGIN;
-//        if (leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + CGRectGetWidth(viewFrame) + leftMargin
-//            > self.rowMaxWidth) {
-        if (isNeedGoNextRow) {
-            
+        if (needsGoNextRow) {
             if(CGRectGetWidth(preTagLabelFrame) > 0.f && maxRow > 0) {
                 nowRow ++;
                 if(nowRow > maxRow)  {
@@ -378,17 +384,94 @@
     }
 }
 
-- (CGRect)layoutAndGetLastFrameWithStartIndex:(NSInteger)startIndex {
+- (CGRect)layoutAndGetLastFrameWithStartIndex:(NSRange)range rowRange:(NSRange)rowRange {
+    
+    CGRect viewFrame, preframe = CGRectZero;
+    NSInteger total = range.location + range.length;
+    NSInteger maxRow = rowRange.length, nowRow = rowRange.location;
+//    NSInteger maxRow = 0, nowRow = 1;
+//    if([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
+//        maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
+//    }
+    
+    for (int i = range.location; i < total ; i++) {
+        preframe = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
+        GCTagLabel* tag = [self tagLabelAtIndex:i];
+        viewFrame = tag.frame;
+        BOOL needsGoNextRow = [self needsGoToTheNextRowWidthFrame:viewFrame
+                                                         preFrame:preframe];
+        
+        CGFloat leftMargin = CGRectGetWidth(preframe) == 0.f ? self.firstRowLeftMargin : 0;
+        CGFloat labelMargin = CGRectGetWidth(preframe) == 0.f ? 0 : LABEL_MARGIN;
+        if (needsGoNextRow) {
+            if(CGRectGetWidth(preframe) > 0.f && maxRow > 0) {
+                nowRow ++;
+                if(nowRow > maxRow)  {
+                    [self addTagLabelToReuseSet:tag];
+                    tag = nil;
+                    tag = [self tagLabelForInterruptIndex:i];
+                    viewFrame = tag.frame;
+                } else {
+                    viewFrame.origin = CGPointMake(0,
+                                                   preframe.origin.y +
+                                                   CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
+                }
+            }
+            else {
+                viewFrame.origin = CGPointMake(0,
+                                               preframe.origin.y +
+                                               CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
+            }
+        } else {
+            viewFrame.origin = CGPointMake(leftMargin + preframe.origin.x + preframe.size.width + labelMargin ,
+                                           preframe.origin.y);
+        }
+        tag.frame = viewFrame;
+        preframe = viewFrame;
+    }
+    
     return CGRectZero;
 }
 
-- (BOOL)isNeedGoNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame {
+- (BOOL)needsGoToTheNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame {
     BOOL isNeed = NO;
     CGFloat leftMargin = CGRectGetWidth(preFrame) == 0.f ? self.firstRowLeftMargin : 0;
+    CGFloat labelMargin = CGRectGetWidth(preFrame) == 0.f ? 0 : LABEL_MARGIN;
     CGFloat occupyWidth = leftMargin + preFrame.origin.x +
-                          preFrame.size.width + CGRectGetWidth(frame);
+                          preFrame.size.width + CGRectGetWidth(frame) + labelMargin;
     isNeed = self.rowMaxWidth < occupyWidth;
     return isNeed;
+}
+
+- (NSInteger)rowOfLabelAtIndex:(NSInteger)indexOfTag{
+    NSInteger row = 1;
+    
+    if(indexOfTag < 0) {
+        return row;
+    }
+    
+    GCTagLabel* tag = [self tagLabelAtIndex:indexOfTag];
+    CGFloat occupyHeight = CGRectGetHeight(tag.frame)+tag.frame.origin.y;
+    
+    NSInteger tempRow = 1;
+    CGFloat h = [GCTagList heightOfRows:tempRow];
+    while (h != occupyHeight) {
+        tempRow++;
+        h = [GCTagList heightOfRows:tempRow];
+        NSLog(@"%.0f,%.0f", h, occupyHeight);
+    }
+    
+//    for (int i = 1; i < 10; i++) {
+//        CGFloat h = [GCTagList heightOfRows:i];
+//        NSLog(@"%.0f,%.0f", h, occupyHeight);
+//        if(h == occupyHeight) {
+//            tempRow = i +1;
+//            break;
+//        }
+//    }
+    
+    row = tempRow;
+    return row;
 }
 
 #pragma mark -
@@ -500,7 +583,7 @@
 
 + (CGFloat)heightOfRows:(NSInteger)numberOfRow {
     NSString* text = @"I'm Sample.";
-    CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:LabelDefaultFontSize]
+    CGSize textSize = [text sizeWithFont:[UIFont fontWithName:@"HelveticaNeue" size:LabelDefaultFontSize]
                        constrainedToSize:CGSizeMake(9999, 9999)
                            lineBreakMode:NSLineBreakByWordWrapping];
     
@@ -674,7 +757,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 - (void)didMoveToSuperview {
     if(![self.superview isKindOfClass:[GCTagList class]]) {
         CGRect rect = self.frame;
-        [self resizeLabel];
+        [self reSizeLabel];
         CGRect frame = self.frame;
         frame.origin = rect.origin;
         self.frame = frame;
@@ -728,7 +811,52 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     return viewFrame;
 }
 
-- (void)resizeLabel {
++ (CGRect)rectangleOfTagLabelWithText:(NSString*)textStr
+                        labelMaxWidth:(CGFloat)maxWidth
+                            labelFont:(UIFont*)font
+                        accessoryType:(GCTagLabelAccessoryType)type {
+    CGSize textSize = [textStr sizeWithFont:font
+                          constrainedToSize:CGSizeMake(9999, 9999)
+                              lineBreakMode:NSLineBreakByWordWrapping];
+    
+    CGFloat deviationValue = type != GCTagLabelAccessoryNone ? 24 : 0;
+    BOOL needCorrection =( (textSize.width + deviationValue + LabelHorizontalPadding * 2) > maxWidth );
+    if(needCorrection) {
+        textSize.width = maxWidth - LabelHorizontalPadding * 2 - deviationValue ;
+    }
+    
+    
+    CGRect labelFrame;
+    labelFrame.origin = CGPointMake(LabelHorizontalPadding, 0);
+    CGRect buttonFrame = CGRectZero;
+    if(type != GCTagLabelAccessoryNone) {
+        CGPoint buttonPoint = CGPointZero;
+        
+        buttonPoint.x = textSize.width + LabelHorizontalPadding;
+        if(!needCorrection)
+            buttonPoint.x -= 9;
+        buttonPoint.y = (textSize.height - 24) / 2 ;
+        
+        buttonFrame = CGRectMake(0, 0, 24, 24);
+        buttonFrame.origin = buttonPoint;
+    }
+    labelFrame.size = textSize;
+    
+    CGFloat viewWidth;
+    if(!CGRectEqualToRect(buttonFrame, CGRectZero))
+        viewWidth = buttonFrame.origin.x + CGRectGetWidth(buttonFrame);
+    else
+        viewWidth = labelFrame.origin.x + CGRectGetWidth(labelFrame);
+    
+    viewWidth += LabelHorizontalPadding;
+    //===========
+    CGRect viewFrame = CGRectZero;
+    viewFrame.size.width = viewWidth;
+    viewFrame.size.height = textSize.height;
+    return viewFrame;
+}
+
+- (void)reSizeLabel {
     CGSize textSize = [self.label.text sizeWithFont:self.label.font
                        constrainedToSize:self.fitSize
                            lineBreakMode:NSLineBreakByWordWrapping];

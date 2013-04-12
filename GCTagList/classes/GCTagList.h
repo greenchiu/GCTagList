@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define version @"0.1.2"
-#define update_date @"2013.04.10 22:31 +0800"
+#define gctaglist_version @"0.1.3"
+#define update_date @"2013.04.11 22:31 +0800"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
