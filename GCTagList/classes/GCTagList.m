@@ -150,20 +150,36 @@
        ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
         return;
     
-    for (int i = range.location; i < range.length; i++) {
-        GCTagLabel* tag = [self tagLabelAtIndex:i];
+    NSInteger oldCount = [self.visibleSet count];
+    
+    for (int i = 0; i < range.length; i++) {
+        NSInteger index = i + range.location;
+        GCTagLabel* tag = [self tagLabelAtIndex:index];
         if(tag) {
             [tag removeFromSuperview];
             [self addTagLabelToReuseSet:tag];
         }
     }
     
-    NSInteger totalCount = [self.dataSource numberOfTagLabelInTagList:self];
-    NSRange reloadRange = NSMakeRange(range.location, totalCount - range.location);
-    if (reloadRange.length == 0)
-        return;
-
-    [self layoutTagLabelsWithRange:reloadRange];
+    NSMutableArray* tempAry = [NSMutableArray arrayWithCapacity:oldCount-range.length];
+    for (int i = range.location+1; i < oldCount; i++) {
+        [tempAry addObject:[self tagLabelAtIndex:i]];
+    }
+    
+    for (int i = 0; i < tempAry.count; i++) {
+        NSInteger newIndex = range.location + i;
+        GCTagLabel* tag = [tempAry objectAtIndex:i];
+        [tag setValue:[NSString stringWithFormat:@"%d", newIndex] forKeyPath:@"index"];
+    }
+    
+    
+//    NSInteger totalCount = [self.dataSource numberOfTagLabelInTagList:self];
+//    NSLog(@"%d", totalCount);
+//    NSRange reloadRange = NSMakeRange(range.location, totalCount - range.location);
+//    if (reloadRange.length == 0)
+//        return;
+//
+//    [self layoutTagLabelsWithRange:reloadRange];
 }
 
 - (void)insertTagLabelWithRagne:(NSRange)range {
@@ -219,7 +235,7 @@
             continue;
         
         rect = (i-1)>=0 ? [self tagLabelAtIndex:(i-1)].frame : CGRectZero;
-        CGFloat leftMargin = CGRectGetWidth(rect) == 0.f ? self.firstRowLeftMargin : 0;
+//        CGFloat leftMargin = CGRectGetWidth(rect) == 0.f ? self.firstRowLeftMargin : 0;
         NSString* tempText;
         if([self.delegate respondsToSelector:@selector(tagList:labelTextForGroupTagLabel:)]) {
             tempText = [self.delegate tagList:self labelTextForGroupTagLabel:i];
@@ -231,9 +247,11 @@
                                                          maxWidth:tag.maxWidth
                                                     accessoryType:groupType];
         
-        float last_width = leftMargin + rect.origin.x + rect.size.width +
-        CGRectGetWidth(tempRect) + leftMargin;
-        if (last_width > self.rowMaxWidth) {
+        BOOL isNeedGoNextRow = [self isNeedGoNextRowWidthFrame:tempRect preFrame:rect];
+//        float last_width = leftMargin + rect.origin.x + rect.size.width +
+//        CGRectGetWidth(tempRect) + leftMargin;
+//        if (last_width > self.rowMaxWidth) {
+        if (isNeedGoNextRow) {
             [self addTagLabelToReuseSet:tag];
             [tag removeFromSuperview];
             tag = nil;
@@ -298,11 +316,15 @@
         
         [self addTappedTarget:tag];
         CGRect viewFrame = tag.frame;
+        
+        BOOL isNeedGoNextRow = [self isNeedGoNextRowWidthFrame:viewFrame
+                                                      preFrame:preTagLabelFrame];
+        
         CGFloat leftMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? self.firstRowLeftMargin : 0;
         CGFloat labelMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? 0 : LABEL_MARGIN;
-        if (leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + CGRectGetWidth(viewFrame) + leftMargin
-            > self.rowMaxWidth) {
-            
+//        if (leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + CGRectGetWidth(viewFrame) + leftMargin
+//            > self.rowMaxWidth) {
+        if (isNeedGoNextRow) {
             
             if(CGRectGetWidth(preTagLabelFrame) > 0.f && maxRow > 0) {
                 nowRow ++;
@@ -358,6 +380,15 @@
 
 - (CGRect)layoutAndGetLastFrameWithStartIndex:(NSInteger)startIndex {
     return CGRectZero;
+}
+
+- (BOOL)isNeedGoNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame {
+    BOOL isNeed = NO;
+    CGFloat leftMargin = CGRectGetWidth(preFrame) == 0.f ? self.firstRowLeftMargin : 0;
+    CGFloat occupyWidth = leftMargin + preFrame.origin.x +
+                          preFrame.size.width + CGRectGetWidth(frame);
+    isNeed = self.rowMaxWidth < occupyWidth;
+    return isNeed;
 }
 
 #pragma mark -
