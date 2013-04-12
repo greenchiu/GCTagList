@@ -167,7 +167,7 @@
     }
     
     NSMutableArray* tempAry = [NSMutableArray arrayWithCapacity:oldCount-range.length];
-    for (int i = range.location+1; i < oldCount; i++) {
+    for (int i = range.location+range.length; i < oldCount; i++) {
         [tempAry addObject:[self tagLabelAtIndex:i]];
     }
     
@@ -179,19 +179,16 @@
     
     
     NSInteger totalCount = [self.dataSource numberOfTagLabelInTagList:self];
-//    NSLog(@"%d", totalCount);
     NSRange reloadRange = NSMakeRange(range.location, totalCount - range.location);
     NSInteger maxRow = 0, nowRow = [self rowOfLabelAtIndex:range.location-1];
     if([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
         maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
     }
-    [self layoutAndGetLastFrameWithStartIndex:reloadRange
-                                     rowRange:NSMakeRange(nowRow, maxRow)];
     
-//    if (reloadRange.length == 0)
-//        return;
-//
-//    [self layoutTagLabelsWithRange:reloadRange];
+    CGRect frame = [self layoutAndGetLastFrameWithStartIndex:reloadRange
+                                                    rowRange:NSMakeRange(nowRow, maxRow)];
+    
+    [self updateViewWithLastFrame:frame];
 }
 
 - (void)insertTagLabelWithRagne:(NSRange)range {
@@ -313,7 +310,6 @@
     
     
     CGRect preTagLabelFrame = CGRectZero;
-    CGFloat totalHeight = 0;
     for (int i = startIndex; i < endIndex; i++) {
         GCTagLabel* tag = (([self.dataSource tagList:self tagLabelAtIndex:i]));
         
@@ -370,23 +366,27 @@
         [self.reuseSet setObject:set forKey:key];
     }
     
-    totalHeight = CGRectGetHeight(preTagLabelFrame) + preTagLabelFrame.origin.y;
+    [self updateViewWithLastFrame:preTagLabelFrame];
     
-    if(CGRectGetHeight(self.frame) == totalHeight)
-        return;
-    
-    CGRect frame = self.frame;
-    frame.size.height = totalHeight;
-    self.frame = frame;
-    
-    if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:didChangedHeight:)]) {
-        [self.delegate tagList:self didChangedHeight:totalHeight];
-    }
+//    CGFloat totalHeight = CGRectGetHeight(preTagLabelFrame) + preTagLabelFrame.origin.y;
+//    
+//    if(CGRectGetHeight(self.frame) == totalHeight)
+//        return;
+//    
+//    CGRect frame = self.frame;
+//    frame.size.height = totalHeight;
+//    self.frame = frame;
+//    
+//    if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:didChangedHeight:)]) {
+//        [self.delegate tagList:self didChangedHeight:totalHeight];
+//    }
 }
 
 - (CGRect)layoutAndGetLastFrameWithStartIndex:(NSRange)range rowRange:(NSRange)rowRange {
     
-    CGRect viewFrame, preframe = CGRectZero;
+    CGRect viewFrame, preframe;
+    NSInteger currentIndex = range.location;
+    preframe = currentIndex > 0 ? [self tagLabelAtIndex:currentIndex-1].frame : CGRectZero;
     NSInteger total = range.location + range.length;
     NSInteger maxRow = rowRange.length, nowRow = rowRange.location;
 //    NSInteger maxRow = 0, nowRow = 1;
@@ -430,7 +430,7 @@
         preframe = viewFrame;
     }
     
-    return CGRectZero;
+    return preframe;
 }
 
 - (BOOL)needsGoToTheNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame {
@@ -458,20 +458,25 @@
     while (h != occupyHeight) {
         tempRow++;
         h = [GCTagList heightOfRows:tempRow];
-        NSLog(@"%.0f,%.0f", h, occupyHeight);
     }
-    
-//    for (int i = 1; i < 10; i++) {
-//        CGFloat h = [GCTagList heightOfRows:i];
-//        NSLog(@"%.0f,%.0f", h, occupyHeight);
-//        if(h == occupyHeight) {
-//            tempRow = i +1;
-//            break;
-//        }
-//    }
     
     row = tempRow;
     return row;
+}
+
+- (void)updateViewWithLastFrame:(CGRect)frame {
+    CGFloat totalHeight = CGRectGetHeight(frame) + frame.origin.y;
+    
+    if(CGRectGetHeight(self.frame) == totalHeight)
+        return;
+    
+    frame = self.frame;
+    frame.size.height = totalHeight;
+    self.frame = frame;
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:didChangedHeight:)]) {
+        [self.delegate tagList:self didChangedHeight:totalHeight];
+    }
 }
 
 #pragma mark -
