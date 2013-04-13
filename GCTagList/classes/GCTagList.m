@@ -32,7 +32,42 @@
 @property (assign) CGFloat rowMaxWidth;
 @property (assign) NSInteger nowSelected;
 
+/**
+ * add taglabel to resue set, if tag has not identifier, the tag will be release.
+ */
+- (void)addTagLabelToReuseSet:(GCTagLabel*)tag;
+
+/**
+ * if taglabel has accessoryButton, add Target will touchupindex for accessoryButton.
+ */
+- (void)addTappedTarget:(GCTagLabel*)tag;
+
+- (void)handleTouchUpInsideTagAccessoryButton:(UIButton*)sender;
+
+/**
+ * if maxRow > 0, and the taglabel's row > maxRow, use this method to find the taglabel which one is the group label.
+ */
 - (GCTagLabel*)tagLabelForInterruptIndex:(NSInteger)startIndex;
+
+/**
+ * layout taglabel with range;
+ */
+- (void)layoutTagLabelsWithRange:(NSRange)range;
+
+/**
+ * if tag needs go the next row, return YES. 
+ */
+- (BOOL)needsGoToTheNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame;
+
+/**
+ * get row of label located.
+ */
+- (NSInteger)rowOfLabelAtIndex:(NSInteger)indexOfTag;
+
+/**
+ * update taglist's frame.
+ */
+- (void)updateViewWithLastFrame:(CGRect)frame;
 @end
 
 @implementation GCTagList
@@ -80,6 +115,7 @@
     return self;
 }
 
+#pragma mark - Public mehtod
 - (GCTagLabel*)dequeueReusableTagLabelWithIdentifier:(NSString *)identifier {
     GCTagLabel* tag = nil;
     
@@ -185,7 +221,7 @@
         maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
     }
     
-    CGRect frame = [self layoutAndGetLastFrameWithStartIndex:reloadRange
+    CGRect frame = [self layoutAndGetLastFrameWithRange:reloadRange
                                                     rowRange:NSMakeRange(nowRow, maxRow)];
     
     [self updateViewWithLastFrame:frame];
@@ -196,6 +232,23 @@
        ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
        ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
         return;
+    
+    
+    NSInteger oldCount = [self.visibleSet count];
+    
+    NSMutableArray* tempAry = [NSMutableArray arrayWithCapacity:oldCount-range.length];
+    for (int i = range.location; i < oldCount; i++) {
+        [tempAry addObject:[self tagLabelAtIndex:i]];
+    }
+    
+    NSInteger sIndex = range.location + range.length;
+    for (int i = 0; i < tempAry.count; i++) {
+        NSInteger newIndex = sIndex + i;
+        GCTagLabel* tag = [tempAry objectAtIndex:i];
+        [tag setValue:[NSString stringWithFormat:@"%d", newIndex] forKeyPath:@"index"];
+    }
+    
+    [self layoutTagLabelsWithRange:range];
 }
 
 #pragma mark - override
@@ -219,6 +272,17 @@
         [tempSet addObject:tag];
         [self.visibleSet minusSet:tempSet];
         [self.reuseSet setObject:tempSet forKey:string];
+    }
+}
+
+- (void)addTappedTarget:(GCTagLabel*)tag {
+    if(tag.accessoryType != GCTagLabelAccessoryNone) {
+        UIButton* accessoryButton = [tag valueForKeyPath:@"accessoryButton"];
+        if(accessoryButton.allTargets.count == 0) {
+            [accessoryButton addTarget:self
+                                action:@selector(handleTouchUpInsideTagAccessoryButton:)
+                      forControlEvents:UIControlEventTouchUpInside];
+        }
     }
 }
 
@@ -276,17 +340,6 @@
     return tag;
 }
 
-- (void)addTappedTarget:(GCTagLabel*)tag {
-    if(tag.accessoryType != GCTagLabelAccessoryNone) {
-        UIButton* accessoryButton = [tag valueForKeyPath:@"accessoryButton"];
-        if(accessoryButton.allTargets.count == 0) {
-            [accessoryButton addTarget:self
-                                action:@selector(handleTouchUpInsideTagAccessoryButton:)
-                      forControlEvents:UIControlEventTouchUpInside];
-        }
-    }
-}
-
 - (void)layoutTagLabelsWithRange:(NSRange)range {
     NSInteger numberOfTagLabel = [self.dataSource numberOfTagLabelInTagList:self];
     NSInteger startIndex = range.location;
@@ -316,7 +369,7 @@
     
     CGRect preTagLabelFrame = CGRectZero;
     
-    GCLog(@"s:%d, e:%d", startIndex, endIndex);
+//    GCLog(@"s:%d, e:%d", startIndex, endIndex);
     for (int i = startIndex; i < endIndex; i++) {
         /**
          * if there is previous label, get the previous's frame.
@@ -375,7 +428,7 @@
     
     if(endIndex < numberOfTagLabel) {
         NSRange layoutRange = NSMakeRange(endIndex, numberOfTagLabel - endIndex);
-        preTagLabelFrame = [self layoutAndGetLastFrameWithStartIndex:layoutRange
+        preTagLabelFrame = [self layoutAndGetLastFrameWithRange:layoutRange
                                                             rowRange:NSMakeRange(nowRow, maxRow)];
     }
     
@@ -388,7 +441,17 @@
     [self updateViewWithLastFrame:preTagLabelFrame];
 }
 
-- (CGRect)layoutAndGetLastFrameWithStartIndex:(NSRange)range rowRange:(NSRange)rowRange {
+- (BOOL)needsGoToTheNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame {
+    BOOL isNeed = NO;
+    CGFloat leftMargin = CGRectGetWidth(preFrame) == 0.f ? self.firstRowLeftMargin : 0;
+    CGFloat labelMargin = CGRectGetWidth(preFrame) == 0.f ? 0 : LABEL_MARGIN;
+    CGFloat occupyWidth = leftMargin + preFrame.origin.x +
+    preFrame.size.width + CGRectGetWidth(frame) + labelMargin;
+    isNeed = self.rowMaxWidth < occupyWidth;
+    return isNeed;
+}
+
+- (CGRect)layoutAndGetLastFrameWithRange:(NSRange)range rowRange:(NSRange)rowRange {
     
     NSInteger maxRow = rowRange.length, nowRow = rowRange.location;
     NSInteger total = range.location + range.length;
@@ -448,17 +511,7 @@
     return preframe;
 }
 
-- (BOOL)needsGoToTheNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame {
-    BOOL isNeed = NO;
-    CGFloat leftMargin = CGRectGetWidth(preFrame) == 0.f ? self.firstRowLeftMargin : 0;
-    CGFloat labelMargin = CGRectGetWidth(preFrame) == 0.f ? 0 : LABEL_MARGIN;
-    CGFloat occupyWidth = leftMargin + preFrame.origin.x +
-                          preFrame.size.width + CGRectGetWidth(frame) + labelMargin;
-    isNeed = self.rowMaxWidth < occupyWidth;
-    return isNeed;
-}
-
-- (NSInteger)rowOfLabelAtIndex:(NSInteger)indexOfTag{
+- (NSInteger)rowOfLabelAtIndex:(NSInteger)indexOfTag {
     NSInteger row = 1;
     
     if(indexOfTag < 0) {

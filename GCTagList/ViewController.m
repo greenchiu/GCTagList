@@ -72,8 +72,28 @@
 
 - (void)tagList:(GCTagList *)tagList accessoryButtonTappedAtIndex:(NSInteger)index {
 //    NSLog(@"%s", __func__);
-    [self.tagNames removeObjectAtIndex:index];
-    [tagList reloadData];
+//    [self.tagNames removeObjectAtIndex:index];
+    
+//    [self.tagNames removeObjectAtIndex:index];
+//    [self.tagNames removeObjectAtIndex:index];
+//
+    
+//    NSInteger allCount = [self.tagNames count];
+//    [self.tagNames removeObjectsInRange:NSMakeRange(index, 2)];
+//    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2)];
+    
+//    self.tagNames[index] = @"Kim Jong Kook";
+//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1)];
+
+//    self.tagNames[index] = @"Kim Jong Kook";
+//    self.tagNames[index+1] = @"Girls' Generation";
+//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 2)];
+    
+    [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
+    [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
+    [tagList insertTagLabelWithRagne:NSMakeRange(index, 2)];
+    
+//    [tagList reloadData];
 }
 
 - (void)tagList:(GCTagList *)taglist didChangedHeight:(CGFloat)newHeight {
@@ -84,15 +104,16 @@
     return [NSString stringWithFormat:@"和其他%d位", self.tagNames.count - interruptIndex];
 }
 
-//- (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index {
+- (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index {
 //    NSLog(@"%.0f", [taglist tagLabelAtIndex:index].maxWidth);
-//}
+    NSLog(@"selectIndex:%d", index);
+}
 
 //
 
-- (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList {
-    return 1;
-}
+//- (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList {
+//    return 1;
+//}
 //
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel {
     return GCTagLabelAccessoryArrowFont;

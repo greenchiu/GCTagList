@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define gctaglist_version @"0.1.3"
-#define update_date @"2013.04.11 22:31 +0800"
+#define gctaglist_version @"0.2pre"
+#define update_date @"2013.04.13 12:33 +0800"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
@@ -148,17 +148,17 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 - (void)deselectedLabelAtIndex:(NSInteger)index animated:(BOOL)animated;
 
 /**
- *
+ *  reload taglabel with range.
  */
 - (void)reloadTagLabelWithRange:(NSRange)range;
 
 /**
- *
+ *  delete taglabel with range.
  */
 - (void)deleteTagLabelWithRange:(NSRange)range;
 
 /**
- *
+ *  insert taglabel with range.
  */
 - (void)insertTagLabelWithRagne:(NSRange)range;
 @end
