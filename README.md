@@ -3,13 +3,39 @@ GCTagList
 
 GCTagList like iOS Mail app's sender or recivers tags.
 
-![](Screenshot.png)
+![](Screenshot.png) 
 ![](Screenshot2.png)
 
 ##Installation
 Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`.
 
 ##What's new
+
+* reload with range
+* delete with range
+* insert with range 
+
+
+```Objective-C   
+/**
+ *  reload taglabel with range.
+ */
+- (void)reloadTagLabelWithRange:(NSRange)range;
+
+/**
+ *  delete taglabel with range.
+ */
+- (void)deleteTagLabelWithRange:(NSRange)range;
+
+/**
+ *  insert taglabel with range.
+ */
+- (void)insertTagLabelWithRagne:(NSRange)range;   
+```
+
+I try to imitate UITableView's way - @greenchiu
+
+## Features
 
 * support MaxRow
 * TagLabel could set not show selectedState. (selectedEnabled)
