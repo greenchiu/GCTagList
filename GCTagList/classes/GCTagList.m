@@ -137,15 +137,15 @@
        ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
        ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
         return;
-    
-    for (int i = range.location; i < range.length; i++) {
+    NSInteger sIndex = range.location;
+    NSInteger eIndex = sIndex + range.length;
+    for (int i = sIndex; i < eIndex; i++) {
         GCTagLabel* tag = [self tagLabelAtIndex:i];
         if(tag) {
             [tag removeFromSuperview];
             [self addTagLabelToReuseSet:tag];
         }
     }
-    
     [self layoutTagLabelsWithRange:range];
 }
 
@@ -290,9 +290,10 @@
 - (void)layoutTagLabelsWithRange:(NSRange)range {
     NSInteger numberOfTagLabel = [self.dataSource numberOfTagLabelInTagList:self];
     NSInteger startIndex = range.location;
-    NSInteger endIndex = range.length;
+    NSInteger endIndex = startIndex + range.length;
     
-    if(startIndex+endIndex > numberOfTagLabel) {
+    
+    if(endIndex > numberOfTagLabel) {
         GCLog(@"the range is error.");
         return;
     }
@@ -303,6 +304,10 @@
         maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
     }
     
+    if (startIndex > 0) {
+        nowRow = [self rowOfLabelAtIndex:startIndex-1];
+    }
+    
     GCTagLabelAccessoryType groupType = GCTagLabelAccessoryNone;
     if([self.dataSource respondsToSelector:@selector(accessoryTypeForGroupTagLabel)]) {
         groupType = [self.dataSource accessoryTypeForGroupTagLabel];
@@ -310,7 +315,15 @@
     
     
     CGRect preTagLabelFrame = CGRectZero;
+    
+    GCLog(@"s:%d, e:%d", startIndex, endIndex);
     for (int i = startIndex; i < endIndex; i++) {
+        /**
+         * if there is previous label, get the previous's frame.
+         */
+        if(CGRectEqualToRect(preTagLabelFrame, CGRectZero)) {
+            preTagLabelFrame = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
+        }
         GCTagLabel* tag = (([self.dataSource tagList:self tagLabelAtIndex:i]));
         
         if(tag.maxWidthFitToListWidth)
@@ -360,6 +373,12 @@
     }
     
     
+    if(endIndex < numberOfTagLabel) {
+        NSRange layoutRange = NSMakeRange(endIndex, numberOfTagLabel - endIndex);
+        preTagLabelFrame = [self layoutAndGetLastFrameWithStartIndex:layoutRange
+                                                            rowRange:NSMakeRange(nowRow, maxRow)];
+    }
+    
     for (NSString* key in [self.reuseSet allKeys]) {
         NSMutableSet *set = [self.reuseSet objectForKey:key];
         [set minusSet:self.visibleSet];
@@ -367,32 +386,28 @@
     }
     
     [self updateViewWithLastFrame:preTagLabelFrame];
-    
-//    CGFloat totalHeight = CGRectGetHeight(preTagLabelFrame) + preTagLabelFrame.origin.y;
-//    
-//    if(CGRectGetHeight(self.frame) == totalHeight)
-//        return;
-//    
-//    CGRect frame = self.frame;
-//    frame.size.height = totalHeight;
-//    self.frame = frame;
-//    
-//    if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:didChangedHeight:)]) {
-//        [self.delegate tagList:self didChangedHeight:totalHeight];
-//    }
 }
 
 - (CGRect)layoutAndGetLastFrameWithStartIndex:(NSRange)range rowRange:(NSRange)rowRange {
     
+    NSInteger maxRow = rowRange.length, nowRow = rowRange.location;
+    NSInteger total = range.location + range.length;
+    /**
+     * maxRow default 0, it means not limit maxRow.
+     */
+    if(nowRow > maxRow && maxRow > 0) {
+        for (int i = range.location; i < total ; i++) {
+            GCTagLabel* tag = [self tagLabelAtIndex:i];
+            [tag removeFromSuperview];
+            [self addTagLabelToReuseSet:tag];
+        }
+        return range.location > 0 ? [self tagLabelAtIndex:range.location-1].frame : CGRectZero;
+    }
+    
     CGRect viewFrame, preframe;
     NSInteger currentIndex = range.location;
     preframe = currentIndex > 0 ? [self tagLabelAtIndex:currentIndex-1].frame : CGRectZero;
-    NSInteger total = range.location + range.length;
-    NSInteger maxRow = rowRange.length, nowRow = rowRange.location;
-//    NSInteger maxRow = 0, nowRow = 1;
-//    if([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
-//        maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
-//    }
+    
     
     for (int i = range.location; i < total ; i++) {
         preframe = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
