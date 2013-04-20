@@ -144,9 +144,7 @@
 }
 
 - (void)reloadData {
-    if(!self.dataSource ||
-       ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
-       ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
+    if(![self checkImplementDataSourceRequireMehtod])
         return;
     
     for (GCTagLabel* tag in self.subviews) {
@@ -169,10 +167,9 @@
 }
 
 - (void)reloadTagLabelWithRange:(NSRange)range {
-    if(!self.dataSource ||
-       ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
-       ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
+    if(![self checkImplementDataSourceRequireMehtod])
         return;
+    
     NSInteger sIndex = range.location;
     NSInteger eIndex = sIndex + range.length;
     for (int i = sIndex; i < eIndex; i++) {
@@ -186,9 +183,7 @@
 }
 
 - (void)deleteTagLabelWithRange:(NSRange)range {
-    if(!self.dataSource ||
-       ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
-       ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
+    if(![self checkImplementDataSourceRequireMehtod])
         return;
     
     NSInteger oldCount = [self.visibleSet count];
@@ -228,9 +223,7 @@
 }
 
 - (void)insertTagLabelWithRagne:(NSRange)range {
-    if(!self.dataSource ||
-       ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
-       ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
+    if(![self checkImplementDataSourceRequireMehtod])
         return;
     
     
@@ -251,6 +244,16 @@
     [self layoutTagLabelsWithRange:range];
 }
 
+- (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated {
+    if(![self checkImplementDataSourceRequireMehtod])
+        return;
+    
+    if(!animated) {
+        [self reloadTagLabelWithRange:range];
+        return;
+    }
+}
+
 #pragma mark - override
 - (UIView*)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     UIView* temp = [super hitTest:point withEvent:event];
@@ -262,6 +265,15 @@
 
 #pragma mark -
 #pragma mark Private
+- (BOOL)checkImplementDataSourceRequireMehtod {
+    if(!self.dataSource ||
+       ![self.dataSource respondsToSelector:@selector(numberOfTagLabelInTagList:)] ||
+       ![self.dataSource respondsToSelector:@selector(tagList:tagLabelAtIndex:)])
+        return NO;
+    
+    return YES;
+}
+
 - (void)addTagLabelToReuseSet:(GCTagLabel*)tag {
     if(tag.reuseIdentifier) {
         NSString* string = [NSString stringWithString:tag.reuseIdentifier];
@@ -687,10 +699,10 @@ NSString* imageFontNameForType(GCTagLabelAccessoryType type) {
     NSString* imageFontName;
     
     switch (type) {
-        case GCTagLabelAccessoryArrowFont:
+        case GCTagLabelAccessoryArrowSign:
             imageFontName = @"CGTagList.bundle/blue_arrow.png";
             break;
-        case GCTagLabelAccessoryCrossFont:
+        case GCTagLabelAccessoryCrossSign:
             imageFontName = @"CGTagList.bundle/blue_close.png";
             break;
         default:
@@ -705,10 +717,10 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     CGFloat imageFontLeftInset = 0;
     
     switch (type) {
-        case GCTagLabelAccessoryArrowFont:
+        case GCTagLabelAccessoryArrowSign:
             imageFontLeftInset = 10;
             break;
-        case GCTagLabelAccessoryCrossFont:
+        case GCTagLabelAccessoryCrossSign:
             imageFontLeftInset = 9;
             break;
         default:

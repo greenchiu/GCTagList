@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define gctaglist_version @"0.2pre"
-#define update_date @"2013.04.13 12:33 +0800"
+#define gctaglist_version @"0.21"
+#define update_date @"2013.04.20 15:49 +0800"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
@@ -50,8 +50,8 @@
 
 typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
     GCTagLabelAccessoryNone,
-    GCTagLabelAccessoryCrossFont,
-    GCTagLabelAccessoryArrowFont
+    GCTagLabelAccessoryCrossSign,
+    GCTagLabelAccessoryArrowSign
 };
 
 @class GCTagList, GCTagLabel;
@@ -161,6 +161,9 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
  *  insert taglabel with range.
  */
 - (void)insertTagLabelWithRagne:(NSRange)range;
+
+- (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
+
 @end
 
 @interface GCTagList (AbstractHeight)

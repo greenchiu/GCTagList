@@ -23,7 +23,7 @@
     self.tagNames = [NSMutableArray arrayWithArray:ARY];
     
     GCTagLabel* tagLabel0 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
-    [tagLabel0 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryArrowFont];
+    [tagLabel0 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryArrowSign];
     [self.view addSubview:tagLabel0];
     
     GCTagLabel* tagLabel1 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
@@ -63,7 +63,7 @@
     }
     
     NSString* labelText = self.tagNames[index];
-    GCTagLabelAccessoryType type = GCTagLabelAccessoryCrossFont;
+    GCTagLabelAccessoryType type = GCTagLabelAccessoryCrossSign;
     [tag setLabelText:labelText
         accessoryType:type];
     
@@ -116,7 +116,7 @@
 //}
 //
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel {
-    return GCTagLabelAccessoryArrowFont;
+    return GCTagLabelAccessoryArrowSign;
 }
 
 @end
