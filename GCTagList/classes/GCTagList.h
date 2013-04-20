@@ -163,6 +163,8 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 - (void)insertTagLabelWithRagne:(NSRange)range;
 
 - (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
+- (void)deleteTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
+- (void)insertTagLabelWithRagne:(NSRange)range withAnimation:(BOOL)animated;
 
 @end
 

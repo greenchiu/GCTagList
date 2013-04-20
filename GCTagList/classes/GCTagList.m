@@ -180,8 +180,32 @@
     if(![self checkImplementDataSourceRequireMehtod])
         return;
     
+    [self reloadTagLabelWithRange:range withAnimation:NO];
+    
+//    NSInteger sIndex = range.location;
+//    NSInteger eIndex = sIndex + range.length;
+//    for (int i = sIndex; i < eIndex; i++) {
+//        GCTagLabel* tag = [self tagLabelAtIndex:i];
+//        if(tag) {
+//            [tag removeFromSuperview];
+//            [self addTagLabelToReuseSet:tag];
+//        }
+//    }
+//    [self layoutTagLabelsWithRange:range];
+}
+
+- (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated {
+    if(![self checkImplementDataSourceRequireMehtod])
+        return;
+    
+//    if(!animated) {
+//        [self reloadTagLabelWithRange:range];
+//        return;
+//    }
+    
     NSInteger sIndex = range.location;
     NSInteger eIndex = sIndex + range.length;
+    
     for (int i = sIndex; i < eIndex; i++) {
         GCTagLabel* tag = [self tagLabelAtIndex:i];
         if(tag) {
@@ -189,12 +213,62 @@
             [self addTagLabelToReuseSet:tag];
         }
     }
-    [self layoutTagLabelsWithRange:range];
+    
+    [self layoutTagLabelsWithRange:range
+                         animation:animated];
+    
 }
 
 - (void)deleteTagLabelWithRange:(NSRange)range {
     if(![self checkImplementDataSourceRequireMehtod])
         return;
+    [self deleteTagLabelWithRange:range withAnimation:NO];
+//    NSInteger oldCount = [self.visibleSet count];
+//    
+//    for (int i = 0; i < range.length; i++) {
+//        NSInteger index = i + range.location;
+//        GCTagLabel* tag = [self tagLabelAtIndex:index];
+//        if(tag) {
+//            [tag removeFromSuperview];
+//            [self addTagLabelToReuseSet:tag];
+//        }
+//    }
+//    
+//    NSMutableArray* tempAry = [NSMutableArray arrayWithCapacity:oldCount-range.length];
+//    for (int i = range.location+range.length; i < oldCount; i++) {
+//        [tempAry addObject:[self tagLabelAtIndex:i]];
+//    }
+//    
+//    for (int i = 0; i < tempAry.count; i++) {
+//        NSInteger newIndex = range.location + i;
+//        GCTagLabel* tag = [tempAry objectAtIndex:i];
+//        [tag setValue:[NSString stringWithFormat:@"%d", newIndex] forKeyPath:@"index"];
+//    }
+//    
+//    
+//    NSInteger totalCount = [self.dataSource numberOfTagLabelInTagList:self];
+//    NSRange reloadRange = NSMakeRange(range.location, totalCount - range.location);
+//    NSInteger maxRow = 0, nowRow = [self rowOfLabelAtIndex:range.location-1];
+//    if([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
+//        maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
+//    }
+//    
+//    CGRect frame = [self layoutAndGetLastFrameWithRange:reloadRange
+//                                               rowRange:NSMakeRange(nowRow, maxRow)
+//                                               animated:NO
+//                                              lastFrame:CGRectNull];
+//    
+//    [self updateViewWithLastFrame:frame];
+}
+
+- (void)deleteTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated {
+    if(![self checkImplementDataSourceRequireMehtod])
+        return;
+    
+//    if(!animated) {
+//        [self deleteTagLabelWithRange:range];
+//        return;
+//    }
     
     NSInteger oldCount = [self.visibleSet count];
     
@@ -228,12 +302,38 @@
     
     CGRect frame = [self layoutAndGetLastFrameWithRange:reloadRange
                                                rowRange:NSMakeRange(nowRow, maxRow)
-                                               animated:NO];
+                                               animated:animated
+                                              lastFrame:CGRectNull];
     
     [self updateViewWithLastFrame:frame];
+    
 }
 
 - (void)insertTagLabelWithRagne:(NSRange)range {
+    if(![self checkImplementDataSourceRequireMehtod])
+        return;
+    
+    [self insertTagLabelWithRagne:range withAnimation:NO];
+    
+//    
+//    NSInteger oldCount = [self.visibleSet count];
+//    
+//    NSMutableArray* tempAry = [NSMutableArray arrayWithCapacity:oldCount-range.length];
+//    for (int i = range.location; i < oldCount; i++) {
+//        [tempAry addObject:[self tagLabelAtIndex:i]];
+//    }
+//    
+//    NSInteger sIndex = range.location + range.length;
+//    for (int i = 0; i < tempAry.count; i++) {
+//        NSInteger newIndex = sIndex + i;
+//        GCTagLabel* tag = [tempAry objectAtIndex:i];
+//        [tag setValue:[NSString stringWithFormat:@"%d", newIndex] forKeyPath:@"index"];
+//    }
+//    
+//    [self layoutTagLabelsWithRange:range];
+}
+
+- (void)insertTagLabelWithRagne:(NSRange)range withAnimation:(BOOL)animated {
     if(![self checkImplementDataSourceRequireMehtod])
         return;
     
@@ -252,53 +352,7 @@
         [tag setValue:[NSString stringWithFormat:@"%d", newIndex] forKeyPath:@"index"];
     }
     
-    [self layoutTagLabelsWithRange:range];
-}
-
-- (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated {
-    if(![self checkImplementDataSourceRequireMehtod])
-        return;
-    
-    if(!animated) {
-        [self reloadTagLabelWithRange:range];
-        return;
-    }
-    
-    NSInteger sIndex = range.location;
-    NSInteger eIndex = sIndex + range.length;
-    
-    NSMutableArray* removeArray = [NSMutableArray arrayWithCapacity:range.length];
-    for (int i = sIndex; i < eIndex; i++) {
-        GCTagLabel* tag = [self tagLabelAtIndex:i];
-        if(tag) {
-            NSInteger index = [[tag valueForKeyPath:@"index"] integerValue];
-            index += 3400;
-            [tag setValue:[NSNumber numberWithInteger:index] forKey:@"index"];
-            [removeArray addObject:tag];
-        }
-    }
-    
-    [self layoutTagLabelsWithRange:range
-                         animation:YES];
-    
-    GC_BLOCK_WEAK GCTagList* weakObject = self;
-    
-    [UIView animateWithDuration:0.33f
-                     animations:^{
-                         for (int i = 0; i < range.length; i++) {
-                             [[removeArray objectAtIndex:i] setAlpha:0];
-                         }
-                     }
-                     completion:^(BOOL finished) {
-                         for (int i = 0; i < range.length; i++) {
-                             GCTagLabel* tag = [removeArray objectAtIndex:i];
-                             if(tag) {
-                                 [tag removeFromSuperview];
-                                 [weakObject addTagLabelToReuseSet:tag];
-                             }
-                         }
-                     }];
-    
+    [self layoutTagLabelsWithRange:range animation:animated];
 }
 
 #pragma mark - override
@@ -487,7 +541,8 @@
         NSRange layoutRange = NSMakeRange(endIndex, numberOfTagLabel - endIndex);
         preTagLabelFrame = [self layoutAndGetLastFrameWithRange:layoutRange
                                                        rowRange:NSMakeRange(nowRow, maxRow)
-                                                       animated:NO];
+                                                       animated:NO
+                                                      lastFrame:preTagLabelFrame];
     }
     
     for (NSString* key in [self.reuseSet allKeys]) {
@@ -707,26 +762,22 @@
     }
     
     if(animated) {
-        
-        
         [UIView animateWithDuration:0.33f animations:^ {
-            
             for (int i = 0; i < values.count ; i++) {
                 CGRect frame = [[values objectAtIndex:i] CGRectValue];
                 GCTagLabel* tag = [animationTags objectAtIndex:i];
                 tag.frame = frame;
                 tag.alpha = 1.f;
             }
-            
         }];
-        
     }
     
     if(endIndex < numberOfTagLabel) {
         NSRange layoutRange = NSMakeRange(endIndex, numberOfTagLabel - endIndex);
         preTagLabelFrame = [self layoutAndGetLastFrameWithRange:layoutRange
                                                        rowRange:NSMakeRange(nowRow, maxRow)
-                                                       animated:animated];
+                                                       animated:animated
+                                                      lastFrame:preTagLabelFrame];
     }
     
     for (NSString* key in [self.reuseSet allKeys]) {
@@ -739,7 +790,10 @@
     [self updateViewWithLastFrame:preTagLabelFrame];
 }
 
-- (CGRect)layoutAndGetLastFrameWithRange:(NSRange)range rowRange:(NSRange)rowRange animated:(BOOL)animated {
+- (CGRect)layoutAndGetLastFrameWithRange:(NSRange)range
+                                rowRange:(NSRange)rowRange
+                                animated:(BOOL)animated
+                               lastFrame:(CGRect)lastframe {
     
     NSInteger maxRow = rowRange.length, nowRow = rowRange.location;
     NSInteger total = range.location + range.length;
@@ -755,24 +809,31 @@
         return range.location > 0 ? [self tagLabelAtIndex:range.location-1].frame : CGRectZero;
     }
     
-    CGRect viewFrame, preframe;
+    CGRect viewFrame, preframe = lastframe;
     NSInteger currentIndex = range.location;
-    preframe = currentIndex > 0 ? [self tagLabelAtIndex:currentIndex-1].frame : CGRectZero;
+//    preframe = currentIndex > 0 ? [self tagLabelAtIndex:currentIndex-1].frame : CGRectZero;
     
     NSMutableArray* moveTag = [NSMutableArray array];
     
     for (int i = currentIndex; i < total ; i++) {
         
-        if (i == currentIndex) {
+        if (i == currentIndex && CGRectEqualToRect(lastframe, CGRectNull)) {
             preframe = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
-        } else {
+        } else if(i > currentIndex) {
             preframe = [[[moveTag lastObject] objectForKey:@"frame"] CGRectValue];
         }
         GCTagLabel* tag = [self tagLabelAtIndex:i];
         viewFrame = tag.frame;
         
-        if(animated && i== range.location) {
-            viewFrame.origin.y += 10;
+//        if(animated && i== range.location) {
+//            viewFrame.origin.y += 10;
+//        }
+        
+        if (i == currentIndex) {
+            CGFloat dy = ABS(viewFrame.origin.y - preframe.origin.y);
+            if(dy == 10.f) {
+                viewFrame.origin.y = preframe.origin.y;
+            }
         }
         
         BOOL needsGoNextRow = [self needsGoToTheNextRowWidthFrame:viewFrame
