@@ -79,14 +79,14 @@
 //
     
 //    NSInteger allCount = [self.tagNames count];
-//    [self.tagNames removeObjectsInRange:NSMakeRange(index, 2)];
+    [self.tagNames removeObjectsInRange:NSMakeRange(index, 2)];
 //    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2)];
     
+    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
 //    NSLog(@"%@", self.tagNames);
-//    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2) withAnimation:NO];
-    self.tagNames[index] = @"Kim Jong Kook";
+//    self.tagNames[index] = @"Kim Jong Kook";
 //    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1)];
-    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1) withAnimation:NO];
+//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1) withAnimation:NO];
     
     
 //    self.tagNames[index] = @"Kim Jong Kook";
