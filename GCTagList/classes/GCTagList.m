@@ -56,8 +56,6 @@
 /**
  * layout taglabel with range;
  */
-- (void)layoutTagLabelsWithRange:(NSRange)range __deprecated;
-
 - (void)layoutTagLabelsWithRange:(NSRange)range animation:(BOOL)animated;
 
 /**
@@ -319,6 +317,7 @@
     if(self.delegate && [self.delegate respondsToSelector:@selector(tagList:accessoryButtonTappedAtIndex:)]) {
         NSInteger index = [[(GCTagLabel*)[sender superview] valueForKeyPath:@"index"] integerValue];
         [self.delegate tagList:self accessoryButtonTappedAtIndex:index];
+        sender.highlighted = NO;
     }
 }
 
@@ -367,107 +366,6 @@
         break;
     }
     return tag;
-}
-
-- (void)layoutTagLabelsWithRange:(NSRange)range {
-    NSInteger numberOfTagLabel = [self.dataSource numberOfTagLabelInTagList:self];
-    NSInteger startIndex = range.location;
-    NSInteger endIndex = startIndex + range.length;
-    
-    
-    if(endIndex > numberOfTagLabel) {
-        GCLog(@"the range is error.");
-        return;
-    }
-    
-    
-    NSInteger maxRow = 0, nowRow = 1;
-    if([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
-        maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
-    }
-    
-    if (startIndex > 0) {
-        nowRow = [self rowOfLabelAtIndex:startIndex-1];
-    }
-    
-    GCTagLabelAccessoryType groupType = GCTagLabelAccessoryNone;
-    if([self.dataSource respondsToSelector:@selector(accessoryTypeForGroupTagLabel)]) {
-        groupType = [self.dataSource accessoryTypeForGroupTagLabel];
-    }
-    
-    
-    CGRect preTagLabelFrame = CGRectZero;
-    for (int i = startIndex; i < endIndex; i++) {
-        /**
-         * if there is previous label, get the previous's frame.
-         */
-        if(CGRectEqualToRect(preTagLabelFrame, CGRectZero)) {
-            preTagLabelFrame = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
-        }
-        GCTagLabel* tag = (([self.dataSource tagList:self tagLabelAtIndex:i]));
-        
-        if(tag.maxWidthFitToListWidth)
-            tag.maxWidth = CGRectGetWidth(self.frame);
-        
-        [tag reSizeLabel];
-        [tag setValue:[NSString stringWithFormat:@"%d",i] forKeyPath:@"index"];
-        
-        [self addTappedTarget:tag];
-        CGRect viewFrame = tag.frame;
-        
-        BOOL needsGoNextRow = [self needsGoToTheNextRowWidthFrame:viewFrame
-                                                          preFrame:preTagLabelFrame];
-        
-        CGFloat leftMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? self.firstRowLeftMargin : 0;
-        CGFloat labelMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? 0 : LABEL_MARGIN;
-        if (needsGoNextRow) {
-            if(CGRectGetWidth(preTagLabelFrame) > 0.f && maxRow > 0) {
-                nowRow ++;
-                if(nowRow > maxRow)  {
-                    [self addTagLabelToReuseSet:tag];
-                    tag = nil;
-                    tag = [self tagLabelForInterruptIndex:i];
-                    viewFrame = tag.frame;
-                } else {
-                    viewFrame.origin = CGPointMake(0,
-                                                   preTagLabelFrame.origin.y +
-                                                   CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
-                }
-            }
-            else {
-                viewFrame.origin = CGPointMake(0,
-                                               preTagLabelFrame.origin.y +
-                                               CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
-            }
-        } else {
-            viewFrame.origin = CGPointMake(leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + labelMargin ,
-                                           preTagLabelFrame.origin.y);
-        }
-        tag.frame = viewFrame;
-        [self addSubview:tag];
-        [self.visibleSet addObject:tag];
-        preTagLabelFrame = viewFrame;
-        if(maxRow > 0 && nowRow > maxRow) {
-            break;
-        }
-    }
-    
-    
-    if(endIndex < numberOfTagLabel) {
-        NSRange layoutRange = NSMakeRange(endIndex, numberOfTagLabel - endIndex);
-        preTagLabelFrame = [self layoutAndGetLastFrameWithRange:layoutRange
-                                                       rowRange:NSMakeRange(nowRow, maxRow)
-                                                       animated:NO
-                                                      lastFrame:preTagLabelFrame];
-    }
-    
-    for (NSString* key in [self.reuseSet allKeys]) {
-        NSMutableSet *set = [self.reuseSet objectForKey:key];
-        [set minusSet:self.visibleSet];
-        [self.reuseSet setObject:set forKey:key];
-    }
-    
-    [self updateViewWithLastFrame:preTagLabelFrame];
 }
 
 - (BOOL)needsGoToTheNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame {
@@ -944,18 +842,22 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     if(!self.label) {
         self.label = GC_AUTORELEASE([[UILabel alloc] init]);
         self.label.textAlignment = 1;
-        self.label.textColor = self.labelTextColor;
         self.label.backgroundColor = [UIColor clearColor];
         self.label.font = [UIFont fontWithName:@"HelveticaNeue" size:LABEL_FONT_SIZE];
         [self addSubview:self.label];
     }
     self.label.text = text;
+    self.label.textColor = self.labelTextColor;
     
     if(type == GCTagLabelAccessoryNone) {
         [self.accessoryButton removeFromSuperview];
         self.accessoryButton = nil;
     } else if (type != GCTagLabelAccessoryNone && !self.accessoryButton) {
         self.accessoryButton = GC_AUTORELEASE([[UIButton alloc] initWithFrame:CGRectMake(0, 0, 24, 24)]);
+        [self addSubview:self.accessoryButton];
+    }
+    
+    if(type!=GCTagLabelAccessoryNone) {
         [self.accessoryButton setImage:[UIImage imageNamed:imageFontNameForType(type)]
                               forState:UIControlStateNormal];
         self.accessoryButton.imageEdgeInsets = UIEdgeInsetsMake(0,
@@ -963,8 +865,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
                                                                 0,
                                                                 0);
         self.accessoryButton.imageView.contentMode = UIViewContentModeCenter;
-        [self addSubview:self.accessoryButton];
+        self.accessoryButton.highlighted = NO;
     }
+    
 }
 
 - (NSString*)reuseIdentifier {

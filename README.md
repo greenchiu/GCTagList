@@ -11,34 +11,21 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
 
 ##What's new
 
-* reload with range
-* delete with range
-* insert with range 
-
+* support reload/delete insert with animation.
 
 ```Objective-C   
-/**
- *  reload taglabel with range.
- */
-- (void)reloadTagLabelWithRange:(NSRange)range;
-
-/**
- *  delete taglabel with range.
- */
-- (void)deleteTagLabelWithRange:(NSRange)range;
-
-/**
- *  insert taglabel with range.
- */
-- (void)insertTagLabelWithRagne:(NSRange)range;   
+- (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
+- (void)deleteTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
+- (void)insertTagLabelWithRagne:(NSRange)range withAnimation:(BOOL)animated;
 ```
 
 I try to imitate UITableView's way - @greenchiu
 
 ## Features
 
-* support MaxRow
+* support MaxRow.
 * TagLabel could set not show selectedState. (selectedEnabled)
+* reload/delete/insert with range.
 
 ##Supports
 
