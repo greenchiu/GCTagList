@@ -172,14 +172,6 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 /**
  * Only support TagLabelAccessoryType = GCTagLabelAccessoryNone.
  */
-+ (CGFloat)heightInTagListWithFirstRowLeftMargin:(CGFloat)leftMargin
-                                     tagListWith:(CGFloat)tagListWith
-                                tagLabelMaxWidth:(CGFloat)tagLabelMaxWidth
-                                    tagLabelText:(NSArray*)texts __deprecated;
-
-/**
- * Only support TagLabelAccessoryType = GCTagLabelAccessoryNone.
- */
 + (NSInteger)rowOfTagListWithFirstRowLeftMargin:(CGFloat)leftMargin
                                     tagListWith:(CGFloat)tagListWith
                                tagLabelMaxWidth:(CGFloat)tagLabelMaxWidth
