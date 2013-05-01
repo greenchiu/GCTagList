@@ -736,6 +736,8 @@
 
 #define DEFAULT_LABEL_BACKGROUND_COLOR [UIColor lightGrayColor]
 #define DEFAULT_LABEL_TEXT_COLOR [UIColor blackColor]
+#define DEFAULT_LABEL_GRADIENT_START_COLOR [UIColor lightGrayColor]
+#define DEFAULT_LABEL_GRADIENT_END_COLOR [UIColor whiteColor]
 #define LABEL_CORNER_RADIUS 12.f
 #define LABEL_FONT_SIZE 13.f
 #define HORIZONTAL_PADDING 7.0f
@@ -1007,6 +1009,38 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], (id)[self.labelBackgroundColor CGColor], nil];
     self.gradientLayer.borderColor = self.labelBackgroundColor.CGColor;
     [CATransaction commit];
+}
+
+@end
+
+@implementation UIColor (NSString)
+
++ (UIColor*)colorWithString:(NSString *)colorString {
+    colorString = [colorString stringByReplacingOccurrencesOfString:@"#" withString:@""];
+    colorString = [colorString stringByReplacingOccurrencesOfString:@"0x" withString:@""];
+    switch ([colorString length]) {
+        case 3: {
+            NSString *red = [colorString substringWithRange:NSMakeRange(0, 1)];
+            NSString *green = [colorString substringWithRange:NSMakeRange(1, 1)];
+            NSString *blue = [colorString substringWithRange:NSMakeRange(2, 1)];
+            colorString = [NSString stringWithFormat:@"%1$@%1$@%2$@%2$@%3$@%3$@ff", red, green, blue];
+            break;
+        }
+        case 6:
+            colorString = [colorString stringByAppendingString:@"ff"];
+            break;
+        default:
+            NSLog(@"[UIColor+NSString]: color string has some thing wrong.");
+            colorString = @"000000ff";
+            break;
+    }
+    uint32_t rgba;
+    NSScanner* scanner = [NSScanner scannerWithString:colorString];
+    [scanner scanHexInt:&rgba];
+    return [UIColor colorWithRed:((rgba & 0xFF000000) >> 24) / 255.f
+                           green:((rgba & 0x00FF0000) >> 16) / 255.f
+                            blue:((rgba & 0x0000FF00) >> 8) / 255.f
+                           alpha:((rgba & 0x000000FF)) / 255.f];
 }
 
 @end

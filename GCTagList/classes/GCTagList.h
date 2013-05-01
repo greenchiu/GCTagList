@@ -194,6 +194,11 @@ extern CGFloat const LabelVerticalPadding;
 @property (nonatomic, readonly, copy) NSString* reuseIdentifier;
 @property (nonatomic, GC_STRONG) UIColor *labelTextColor;
 @property (nonatomic, GC_STRONG) UIColor *labelBackgroundColor;
+
+@property (assign) BOOL useGradient;
+@property (nonatomic, GC_STRONG) UIColor *labelStartGradientColor;
+@property (nonatomic, GC_STRONG) UIColor *labelEndGradientColor;
+
 @property (assign) GCTagLabelAccessoryType accessoryType;
 @property (assign) BOOL selectedEnabled; // if YES, the taglabel could show selected state. default is YES.
 @property (readonly) BOOL selected;
@@ -213,4 +218,8 @@ extern CGFloat const LabelVerticalPadding;
 - (id)initReuseIdentifier:(NSString*)identifier;
 - (void)setLabelText:(NSString*)text accessoryType:(GCTagLabelAccessoryType)type;
 - (void)setSelected:(BOOL)selected animation:(BOOL)animated;
+@end
+
+@interface UIColor (NSString)
++ (UIColor*)colorWithString:(NSString*)colorString;
 @end

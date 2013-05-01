@@ -79,24 +79,24 @@
 //
     
 //    NSInteger allCount = [self.tagNames count];
-    [self.tagNames removeObjectsInRange:NSMakeRange(index, 2)];
+//    [self.tagNames removeObjectsInRange:NSMakeRange(index, 2)];
 //    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2)];
     
-    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
+//    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
 //    NSLog(@"%@", self.tagNames);
 //    self.tagNames[index] = @"Kim Jong Kook";
 //    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1)];
-//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1) withAnimation:NO];
+//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1) withAnimation:YES];
     
     
 //    self.tagNames[index] = @"Kim Jong Kook";
 //    self.tagNames[index+1] = @"Girls' Generation";
-//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 2)];
+//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
-//    [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
-//    [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
+    [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
+    [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
 //    [tagList insertTagLabelWithRagne:NSMakeRange(index, 2)];
-//    [tagList insertTagLabelWithRagne:NSMakeRange(index, 2) withAnimation:NO];
+    [tagList insertTagLabelWithRagne:NSMakeRange(index, 2) withAnimation:YES];
     
 //    [tagList reloadData];
 }
