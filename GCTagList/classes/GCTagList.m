@@ -735,6 +735,7 @@
 #pragma mark ===GCTagLabel===
 
 #define DEFAULT_LABEL_BACKGROUND_COLOR [UIColor lightGrayColor]
+//#define DEFAULT_LABEL_BACKGROUND_COLOR [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f]
 #define DEFAULT_LABEL_TEXT_COLOR [UIColor blackColor]
 #define DEFAULT_LABEL_GRADIENT_START_COLOR [UIColor lightGrayColor]
 #define DEFAULT_LABEL_GRADIENT_END_COLOR [UIColor whiteColor]
@@ -793,6 +794,10 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 @property (nonatomic, GC_STRONG) UILabel* label;
 @property (nonatomic, GC_STRONG) UIButton* accessoryButton;
 @property (nonatomic, GC_STRONG) NSString* privateReuseIdentifier;
+
+@property (nonatomic, GC_STRONG) UIColor *selectedStartGrandientColor;
+@property (nonatomic, GC_STRONG) UIColor *selectedEndGrandientColor;
+
 @property (assign) NSInteger index;
 @end
 
@@ -805,8 +810,12 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 
 - (void)dealloc {
     // public property
-    self.labelBackgroundColor = nil;
     self.labelTextColor = nil;
+    
+    self.endGradientColor = nil;
+    self.startGradientColor = nil;
+    self.selectedEndGrandientColor = nil;
+    self.selectedStartGrandientColor = nil;
     
     // private property
     self.gradientLayer = nil;
@@ -828,10 +837,17 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.privateReuseIdentifier = identifier;
         self.fitSize = CGSizeMake(self.maxWidth, 1500);
         self.labelTextColor = DEFAULT_LABEL_TEXT_COLOR;
-        self.labelBackgroundColor = DEFAULT_LABEL_BACKGROUND_COLOR;
+        
         self.gradientLayer = [CAGradientLayer layer];
         self.gradientLayer.cornerRadius = LABEL_CORNER_RADIUS;
-        self.gradientLayer.borderWidth = .8f;
+        self.gradientLayer.borderWidth = 0.f;
+        
+        self.endGradientColor = DEFAULT_LABEL_BACKGROUND_COLOR;
+        self.startGradientColor = [UIColor whiteColor];
+        
+        self.selectedStartGrandientColor = [self.startGradientColor lighten:.1f];
+        self.selectedEndGrandientColor = [self.endGradientColor lighten:.1f];
+        
         [self.layer insertSublayer:self.gradientLayer atIndex:0];
     }
     return self;
@@ -882,8 +898,8 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         return;
     }
     NSArray* colorsArray = !selected ?
-    [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], (id)[self.labelBackgroundColor CGColor], nil] :
-    [NSArray arrayWithObjects:(id)[DEFAULT_LABEL_BACKGROUND_COLOR CGColor], (id)[self.labelBackgroundColor CGColor], nil] ;
+    [NSArray arrayWithObjects:(id)[self.startGradientColor CGColor], (id)[self.endGradientColor CGColor], nil] :
+    [NSArray arrayWithObjects:(id)[self.selectedStartGrandientColor CGColor], (id)[self.selectedEndGrandientColor CGColor], nil] ;
     
     if(!animated) {
         [CATransaction begin];
@@ -907,6 +923,26 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         frame.origin = rect.origin;
         self.frame = frame;
     }
+}
+
+//- (void)setEndGradientColor:(UIColor *)endGradientColor {
+//#if !GC_SUPPORT_ARC
+//    [self->_endGradientColor release];
+//    self->_endGradientColor = nil;
+//    self.selectedEndGrandientColor = nil;
+//#endif
+//    self->_endGradientColor = endGradientColor;
+//    self.selectedEndGrandientColor = [endGradientColor lighten:.1f];
+//}
+
+- (void)setStartGradientColor:(UIColor *)startGradientColor {
+//#if !GC_SUPPORT_ARC
+//    [self->_startGradientColor release];
+//    self->_startGradientColor = nil;
+//    self.selectedStartGrandientColor = nil;
+//#endif
+    self->_startGradientColor = startGradientColor;
+    self.selectedStartGrandientColor = [startGradientColor lighten:.1f];
 }
 
 @end
@@ -1002,18 +1038,20 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     viewFrame.size.height = textSize.height;
     self.frame = viewFrame;
     
+    NSArray* gradientColors;
+    gradientColors = [NSArray arrayWithObjects:(id)self.startGradientColor.CGColor , (id)self.endGradientColor.CGColor, nil];
+    
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue
                      forKey:kCATransactionDisableActions];
     self.gradientLayer.frame = self.bounds;
-    self.gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], (id)[self.labelBackgroundColor CGColor], nil];
-    self.gradientLayer.borderColor = self.labelBackgroundColor.CGColor;
+    self.gradientLayer.colors = gradientColors;
     [CATransaction commit];
 }
 
 @end
 
-@implementation UIColor (NSString)
+@implementation UIColor (Uitilies)
 
 + (UIColor*)colorWithString:(NSString *)colorString {
     colorString = [colorString stringByReplacingOccurrencesOfString:@"#" withString:@""];
@@ -1041,6 +1079,71 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
                            green:((rgba & 0x00FF0000) >> 16) / 255.f
                             blue:((rgba & 0x0000FF00) >> 8) / 255.f
                            alpha:((rgba & 0x000000FF)) / 255.f];
+}
+
+- (UIColor*)darken:(CGFloat)percent {
+    percent = percent > 1 ? 1 : percent;
+    percent = percent < 0 ? 0 : percent;
+    
+    float rgba[4];
+    [self getRGBA:rgba];
+    UIColor* darkerColor = [UIColor colorWithRed:MAX(rgba[0]-percent, 0)
+                                           green:MAX(rgba[1]-percent, 0)
+                                            blue:MAX(rgba[2]-percent, 0)
+                                           alpha:rgba[3]];
+    
+    return darkerColor;
+    
+}
+
+- (UIColor*)lighten:(CGFloat)percent {
+    percent = percent > 1 ? 1 : percent;
+    percent = percent < 0 ? 0 : percent;
+    float rgba[4];
+    [self getRGBA:rgba];
+    UIColor* lighterColor = [UIColor colorWithRed:MIN(rgba[0]+percent, 1)
+                                            green:MIN(rgba[1]+percent, 1)
+                                             blue:MIN(rgba[2]+percent, 1)
+                                            alpha:rgba[3]];
+    
+    return lighterColor;
+}
+
+
+- (void)getRGBA:(float*)rgba {
+    CGColorSpaceModel colorModel = CGColorSpaceGetModel(CGColorGetColorSpace(self.CGColor));
+    const float* colorComponents = CGColorGetComponents( self.CGColor );
+    switch (colorModel)
+    {
+        case kCGColorSpaceModelMonochrome:
+        {
+            rgba[0] = colorComponents[0];
+            rgba[1] = colorComponents[0];
+            rgba[2] = colorComponents[0];
+            rgba[3] = colorComponents[1];
+            break;
+        }
+        case kCGColorSpaceModelRGB:
+        {
+            rgba[0] = colorComponents[0];
+            rgba[1] = colorComponents[1];
+            rgba[2] = colorComponents[2];
+            rgba[3] = colorComponents[3];
+            break;
+        }
+        default:
+        {
+            
+#ifdef DEBUG
+            NSLog(@"Unsupported model: %i", colorModel);
+#endif
+            rgba[0] = 0.0f;
+            rgba[1] = 0.0f;
+            rgba[2] = 0.0f;
+            rgba[3] = 1.0f;
+            break;
+        }
+    }
 }
 
 @end
