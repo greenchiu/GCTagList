@@ -59,7 +59,8 @@
     GCTagLabel* tag = [tagList dequeueReusableTagLabelWithIdentifier:identifier];
     if(!tag) {
         tag = [GCTagLabel tagLabelWithReuseIdentifier:identifier];
-        tag.startGradientColor = [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f];
+//        tag.startGradientColor = [UIColor colorWithString:@"e8e8e8"];
+        tag.endGradientColor = [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f];
 //        NSLog(@"%@", tag.endGradientColor);
     }
     

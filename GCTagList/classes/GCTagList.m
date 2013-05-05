@@ -925,24 +925,24 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     }
 }
 
-//- (void)setEndGradientColor:(UIColor *)endGradientColor {
-//#if !GC_SUPPORT_ARC
-//    [self->_endGradientColor release];
-//    self->_endGradientColor = nil;
-//    self.selectedEndGrandientColor = nil;
-//#endif
-//    self->_endGradientColor = endGradientColor;
-//    self.selectedEndGrandientColor = [endGradientColor lighten:.1f];
-//}
+- (void)setEndGradientColor:(UIColor *)endGradientColor {
+#if !GC_SUPPORT_ARC
+    [self->_endGradientColor release];
+    self->_endGradientColor = nil;
+#endif
+    self->_endGradientColor = GC_RETAIN(endGradientColor);
+    if(endGradientColor)
+        self.selectedEndGrandientColor = [endGradientColor lighten:.1f];
+}
 
 - (void)setStartGradientColor:(UIColor *)startGradientColor {
-//#if !GC_SUPPORT_ARC
-//    [self->_startGradientColor release];
-//    self->_startGradientColor = nil;
-//    self.selectedStartGrandientColor = nil;
-//#endif
-    self->_startGradientColor = startGradientColor;
-    self.selectedStartGrandientColor = [startGradientColor lighten:.1f];
+#if !GC_SUPPORT_ARC
+    [self->_startGradientColor release];
+    self->_startGradientColor = nil;
+#endif
+    self->_startGradientColor = GC_RETAIN(startGradientColor);
+    if(startGradientColor)
+        self.selectedStartGrandientColor = [startGradientColor lighten:.1f];
 }
 
 @end
