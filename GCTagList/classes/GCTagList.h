@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define gctaglist_version @"1.0"
+#define gctaglist_version @"1.1"
 #define update_date @"2013.04.21 12:18 +0800"
 
 #ifndef GC_SUPPORT_ARC

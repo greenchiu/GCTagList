@@ -11,6 +11,7 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
 
 ##What's new
 
+* assign custom label's start and end gradient color.
 * support reload/delete insert with animation.
 
 ```Objective-C   
