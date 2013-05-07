@@ -17,7 +17,7 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
 ```Objective-C   
 - (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
 - (void)deleteTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
-- (void)insertTagLabelWithRagne:(NSRange)range withAnimation:(BOOL)animated;
+- (void)insertTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
 ```
 
 I try to imitate UITableView's way - @greenchiu
