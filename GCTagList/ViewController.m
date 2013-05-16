@@ -97,8 +97,8 @@
     
     [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
     [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
-//    [tagList insertTagLabelWithRagne:NSMakeRange(index, 2)];
-    [tagList insertTagLabelWithRagne:NSMakeRange(index, 2) withAnimation:YES];
+//    [tagList insertTagLabelWithRange:NSMakeRange(index, 2)];
+    [tagList insertTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
 //    [tagList reloadData];
 }

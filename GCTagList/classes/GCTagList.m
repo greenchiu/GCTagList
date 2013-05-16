@@ -243,11 +243,11 @@
     
 }
 
-- (void)insertTagLabelWithRagne:(NSRange)range {
-    [self insertTagLabelWithRagne:range withAnimation:NO];
+- (void)insertTagLabelWithRange:(NSRange)range {
+    [self insertTagLabelWithRange:range withAnimation:NO];
 }
 
-- (void)insertTagLabelWithRagne:(NSRange)range withAnimation:(BOOL)animated {
+- (void)insertTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated {
     if(![self checkImplementDataSourceRequireMehtod])
         return;
     
