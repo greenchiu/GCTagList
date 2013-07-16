@@ -62,6 +62,8 @@
 //        tag.startGradientColor = [UIColor colorWithString:@"e8e8e8"];
         tag.endGradientColor = [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f];
 //        NSLog(@"%@", tag.endGradientColor);
+        
+        [tag setCornerRadius:6.f];
     }
     
     NSString* labelText = self.tagNames[index];

@@ -952,6 +952,10 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.selectedStartGrandientColor = [startGradientColor lighten:.1f];
 }
 
+- (void)setCornerRadius:(CGFloat)cornerRadius {
+    self.gradientLayer.cornerRadius = cornerRadius;
+}
+
 @end
 
 @implementation GCTagLabel (Private)

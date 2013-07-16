@@ -216,6 +216,7 @@ extern CGFloat const LabelVerticalPadding;
 - (id)initReuseIdentifier:(NSString*)identifier;
 - (void)setLabelText:(NSString*)text accessoryType:(GCTagLabelAccessoryType)type;
 - (void)setSelected:(BOOL)selected animation:(BOOL)animated;
+- (void)setCornerRadius:(CGFloat)cornerRadius; // default is 12.f
 @end
 
 @interface UIColor (Uitilies)
