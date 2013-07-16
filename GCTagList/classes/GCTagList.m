@@ -9,14 +9,21 @@
 #import "GCTagList.h"
 
 #ifndef GC_BLOCK_WEAK
-    #if GC_SUPPORT_ARC
+//    #if GC_SUPPORT_ARC
+//        #define GC_BLOCK_WEAK __weak
+//    #else
+//        #define GC_BLOCK_WEAK
+//    #endif
+    #if __has_feature(objc_arc_weak)
         #define GC_BLOCK_WEAK __weak
+    #elif __has_feature(objc_arc)
+        #define GC_BLOCK_WEAK __unsafe_unretained
     #else
-        #define GC_BLOCK_WEAK
+        #define GC_BLOCK_WEAK __block
     #endif
 #endif
 
-#define LABEL_MARGIN 2.0f 
+#define LABEL_MARGIN 2.0f
 #define BOTTOM_MARGIN 5.0f 
 
 #define GCLog(fmt, ...) NSLog((@"[GCLog]:"fmt), ##__VA_ARGS__)

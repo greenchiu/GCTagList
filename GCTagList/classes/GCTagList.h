@@ -29,7 +29,7 @@
 #endif
 
 #ifndef GC_WEAK
-    #if GC_SUPPORT_ARC
+    #if __has_feature(objc_arc_weak) 
         #define GC_WEAK weak
     #elif __has_feature(objc_arc)
         #define GC_WEAK unsafe_unretained
