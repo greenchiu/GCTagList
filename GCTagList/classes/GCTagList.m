@@ -364,6 +364,7 @@
         }
         rect = tag.frame;
         [tag setLabelText:tempText accessoryType:groupType];
+        NSLog(@"index:%d", i);
         [tag reSizeLabel];
         [self addTappedTarget:tag];
         
@@ -470,6 +471,7 @@
         if(tag.maxWidthFitToListWidth)
             tag.maxWidth = CGRectGetWidth(self.frame);
         
+        NSLog(@"index:%d", i);
         [tag reSizeLabel];
         [tag setValue:[NSString stringWithFormat:@"%d",i] forKeyPath:@"index"];
         
@@ -845,6 +847,14 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.fitSize = CGSizeMake(self.maxWidth, 1500);
         self.labelTextColor = DEFAULT_LABEL_TEXT_COLOR;
         
+//        self.labelBackgrounColor = [UIColor colorWithString:@"#E0EAF4"];
+        
+        UIColor* waterBlue = [UIColor colorWithString:@"#E0EAF488"];
+        
+        NSArray* colors = @[waterBlue, [waterBlue darken:.1f], [UIColor whiteColor]];
+        self.gradientColors = colors;
+        self.gradientLocations = @[@0, @0.6, @1.f];
+        
         self.gradientLayer = [CAGradientLayer layer];
         self.gradientLayer.cornerRadius = LABEL_CORNER_RADIUS;
         self.gradientLayer.borderWidth = 0.f;
@@ -856,6 +866,8 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.selectedEndGrandientColor = [self.endGradientColor lighten:.1f];
         
         [self.layer insertSublayer:self.gradientLayer atIndex:0];
+        
+        self.layer.cornerRadius = LABEL_CORNER_RADIUS;
     }
     return self;
 }
@@ -954,6 +966,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 
 - (void)setCornerRadius:(CGFloat)cornerRadius {
     self.gradientLayer.cornerRadius = cornerRadius;
+    self.layer.cornerRadius = cornerRadius;
 }
 
 @end
@@ -1049,14 +1062,27 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     viewFrame.size.height = textSize.height;
     self.frame = viewFrame;
     
-    NSArray* gradientColors;
-    gradientColors = [NSArray arrayWithObjects:(id)self.startGradientColor.CGColor , (id)self.endGradientColor.CGColor, nil];
+    if(self.labelBackgrounColor) {
+        self.backgroundColor = self.labelBackgrounColor;
+        self.gradientLayer.colors = nil;
+        return;
+    }
+    
+    self.backgroundColor = nil;
+    
+    NSMutableArray* gradientColors = [NSMutableArray arrayWithCapacity:self.gradientColors.count];
+//    gradientColors = [NSArray arrayWithObjects:(id)self.startGradientColor.CGColor , (id)self.endGradientColor.CGColor, nil];
+    
+    for (UIColor *color in self.gradientColors) {
+        [gradientColors addObject:(id)color.CGColor];
+    }
     
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue
                      forKey:kCATransactionDisableActions];
     self.gradientLayer.frame = self.bounds;
     self.gradientLayer.colors = gradientColors;
+    self.gradientLayer.locations = [self.gradientLocations copy];
     [CATransaction commit];
 }
 
@@ -1077,6 +1103,8 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         }
         case 6:
             colorString = [colorString stringByAppendingString:@"ff"];
+            break;
+        case 8:
             break;
         default:
             NSLog(@"[UIColor+NSString]: color string has some thing wrong.");

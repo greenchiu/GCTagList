@@ -22,18 +22,18 @@
     
     self.tagNames = [NSMutableArray arrayWithArray:ARY];
     
-    GCTagLabel* tagLabel0 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
-    [tagLabel0 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryArrowSign];
-    [self.view addSubview:tagLabel0];
-    
-    GCTagLabel* tagLabel1 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
-    tagLabel1.maxWidth = 60.f;
-    [tagLabel1 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryNone];
-    
-    CGRect frame = tagLabel1.frame;
-    frame.origin.y = 50;
-    tagLabel1.frame = frame;
-    [self.view addSubview:tagLabel1];
+//    GCTagLabel* tagLabel0 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
+//    [tagLabel0 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryArrowSign];
+//    [self.view addSubview:tagLabel0];
+//    
+//    GCTagLabel* tagLabel1 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
+//    tagLabel1.maxWidth = 60.f;
+//    [tagLabel1 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryNone];
+//    
+//    CGRect frame = tagLabel1.frame;
+//    frame.origin.y = 50;
+//    tagLabel1.frame = frame;
+//    [self.view addSubview:tagLabel1];
     
 //    NSLog(@"heightOfRows:[%d rows]:[%.1f]",2, [GCTagList heightOfRows:1]);
     
@@ -97,10 +97,10 @@
 //    self.tagNames[index+1] = @"Girls' Generation";
 //    [tagList reloadTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
-    [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
-    [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
+//    [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
+//    [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
 //    [tagList insertTagLabelWithRange:NSMakeRange(index, 2)];
-    [tagList insertTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
+//    [tagList insertTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
 //    [tagList reloadData];
 }
