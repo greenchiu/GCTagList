@@ -196,9 +196,17 @@ extern CGFloat const LabelVerticalPadding;
 @property (nonatomic, GC_STRONG) UIColor *startGradientColor;
 @property (nonatomic, GC_STRONG) UIColor *endGradientColor;
 
-@property (nonatomic, GC_STRONG) UIColor *labelBackgrounColor;
-@property (nonatomic, GC_STRONG) NSArray *gradientColors;
-@property (nonatomic, GC_STRONG) NSArray *gradientLocations;
+/**
+ * labelBackgroundColor's Priority > gradientColors
+ */
+@property (nonatomic, GC_STRONG) UIColor *labelBackgroundColor;
+
+/**
+ * if gradientColors's count is less 2, will use default labelBackgroundColor;
+ */
+@property (nonatomic, GC_STRONG) NSArray *gradientColors; ///< ...
+
+@property (nonatomic, GC_STRONG) NSArray *gradientLocations; ///< ...
 
 @property (assign) GCTagLabelAccessoryType accessoryType;
 @property (assign) BOOL selectedEnabled; // if YES, the taglabel could show selected state. default is YES.

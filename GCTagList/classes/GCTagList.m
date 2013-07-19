@@ -9,11 +9,6 @@
 #import "GCTagList.h"
 
 #ifndef GC_BLOCK_WEAK
-//    #if GC_SUPPORT_ARC
-//        #define GC_BLOCK_WEAK __weak
-//    #else
-//        #define GC_BLOCK_WEAK
-//    #endif
     #if __has_feature(objc_arc_weak)
         #define GC_BLOCK_WEAK __weak
     #elif __has_feature(objc_arc)
@@ -35,6 +30,16 @@
                         accessoryType:(GCTagLabelAccessoryType)type;
 
 - (void)reSizeLabel;
+
+/**
+ * use the LabelBackgroundColor the draw the TagLabel's background;
+ */
+- (void)drawTagLabelUseLabelBackgroundColor:(UIColor*)color animated:(BOOL)animated;
+
+/**
+ * use the gradientColors the draw the TagLabel's background;
+ */
+- (void)drawTagLabelUseGradientColors:(NSArray*)colors locations:(NSArray*)locations animated:(BOOL)animated;;
 @end
 
 @interface GCTagList ()
@@ -743,11 +748,17 @@
 #pragma mark -
 #pragma mark ===GCTagLabel===
 
+#define COLOR_WATE_BLUE [UIColor colorWithString:@"#E0EAF4e8"]
+
 #define DEFAULT_LABEL_BACKGROUND_COLOR [UIColor lightGrayColor]
-//#define DEFAULT_LABEL_BACKGROUND_COLOR [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f]
 #define DEFAULT_LABEL_TEXT_COLOR [UIColor blackColor]
 #define DEFAULT_LABEL_GRADIENT_START_COLOR [UIColor lightGrayColor]
 #define DEFAULT_LABEL_GRADIENT_END_COLOR [UIColor whiteColor]
+
+#define DEFAULT_LABEL_GRANITEN_COLORS @[ (id)COLOR_WATE_BLUE.CGColor, (id)[COLOR_WATE_BLUE darken:.3f].CGColor, (id)[UIColor whiteColor].CGColor]
+
+#define DEFAULT_LABEL_GRANDIEN_LOCATIONS @[@0, @0.4, @1];
+
 #define LABEL_CORNER_RADIUS 12.f
 #define LABEL_FONT_SIZE 13.f
 #define HORIZONTAL_PADDING 7.0f
@@ -849,11 +860,10 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         
 //        self.labelBackgrounColor = [UIColor colorWithString:@"#E0EAF4"];
         
-        UIColor* waterBlue = [UIColor colorWithString:@"#E0EAF488"];
-        
-        NSArray* colors = @[waterBlue, [waterBlue darken:.1f], [UIColor whiteColor]];
-        self.gradientColors = colors;
-        self.gradientLocations = @[@0, @0.6, @1.f];
+//        UIColor* waterBlue = [UIColor colorWithString:@"#E0EAF4"];
+//        NSArray* colors = @[ waterBlue, [waterBlue darken:.2f], [UIColor whiteColor]];
+//        self.gradientColors = colors;
+//        self.gradientLocations = @[@0, @0.65, @1.f];
         
         self.gradientLayer = [CAGradientLayer layer];
         self.gradientLayer.cornerRadius = LABEL_CORNER_RADIUS;
@@ -1062,27 +1072,77 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     viewFrame.size.height = textSize.height;
     self.frame = viewFrame;
     
-    if(self.labelBackgrounColor) {
-        self.backgroundColor = self.labelBackgrounColor;
-        self.gradientLayer.colors = nil;
+    if(!self.labelBackgroundColor && !self.gradientColors) {
+//        self.backgroundColor = COLOR_WATE_BLUE;
+        [self drawTagLabelUseLabelBackgroundColor:COLOR_WATE_BLUE animated:NO];
+        return;
+    }
+    
+    if(self.labelBackgroundColor) {
+        [self drawTagLabelUseLabelBackgroundColor:self.labelBackgroundColor animated:NO];
         return;
     }
     
     self.backgroundColor = nil;
     
-    NSMutableArray* gradientColors = [NSMutableArray arrayWithCapacity:self.gradientColors.count];
-//    gradientColors = [NSArray arrayWithObjects:(id)self.startGradientColor.CGColor , (id)self.endGradientColor.CGColor, nil];
+    NSMutableArray* gradientColors = nil;
+    NSArray* tempLocations = nil;
+    if(self.gradientColors && self.gradientColors.count > 2) {
+        gradientColors = [NSMutableArray arrayWithCapacity:self.gradientColors.count];
+        
+        for (UIColor *color in self.gradientColors) {
+            [gradientColors addObject:(id)color.CGColor];
+        }
+        tempLocations = self.gradientLocations;
     
-    for (UIColor *color in self.gradientColors) {
-        [gradientColors addObject:(id)color.CGColor];
+    } else if(self.gradientColors.count < 2) {
+        [self drawTagLabelUseLabelBackgroundColor:COLOR_WATE_BLUE animated:NO];
+        return;
     }
+
+    if(!tempLocations)
+        tempLocations = DEFAULT_LABEL_GRANDIEN_LOCATIONS;
+    
+    [self drawTagLabelUseGradientColors:gradientColors locations:tempLocations animated:NO];
+    
+//    [CATransaction begin];
+//    [CATransaction setValue:(id)kCFBooleanTrue
+//                     forKey:kCATransactionDisableActions];
+//    self.gradientLayer.frame = self.bounds;
+//    self.gradientLayer.colors = gradientColors;
+//    self.gradientLayer.locations = tempLocations;
+//    [CATransaction commit];
+}
+
+- (void)drawTagLabelUseLabelBackgroundColor:(UIColor *)color animated:(BOOL)animated {
+    self.gradientLayer.colors = nil;
+    
     
     [CATransaction begin];
-    [CATransaction setValue:(id)kCFBooleanTrue
-                     forKey:kCATransactionDisableActions];
+    if(animated) {
+        [CATransaction setValue:(id)kCFBooleanTrue
+                         forKey:kCATransactionDisableActions];
+    }
+    else
+        [CATransaction setAnimationDuration:.3f];
+    
+    self.layer.backgroundColor = color.CGColor;
+    [CATransaction commit];
+    
+}
+
+- (void)drawTagLabelUseGradientColors:(NSArray *)colors locations:(NSArray *)locations animated:(BOOL)animated {
+    [CATransaction begin];
+    if(animated) {
+        [CATransaction setValue:(id)kCFBooleanTrue
+                         forKey:kCATransactionDisableActions];
+    }
+    else
+        [CATransaction setAnimationDuration:.3f];
+    
     self.gradientLayer.frame = self.bounds;
-    self.gradientLayer.colors = gradientColors;
-    self.gradientLayer.locations = [self.gradientLocations copy];
+    self.gradientLayer.colors = colors;
+    self.gradientLayer.locations = locations;
     [CATransaction commit];
 }
 
@@ -1147,7 +1207,6 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     
     return lighterColor;
 }
-
 
 - (void)getRGBA:(float*)rgba {
     CGColorSpaceModel colorModel = CGColorSpaceGetModel(CGColorGetColorSpace(self.CGColor));
