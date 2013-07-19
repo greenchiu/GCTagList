@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define gctaglist_version @"1.1"
-#define update_date @"2013.04.21 12:18 +0800"
+#define gctaglist_version @"1.2"
+#define update_date @"2013.07.19 16:26 +0800"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
@@ -193,8 +193,8 @@ extern CGFloat const LabelVerticalPadding;
 @interface GCTagLabel : UIView
 @property (nonatomic, readonly, copy) NSString* reuseIdentifier;
 @property (nonatomic, GC_STRONG) UIColor *labelTextColor;
-@property (nonatomic, GC_STRONG) UIColor *startGradientColor;
-@property (nonatomic, GC_STRONG) UIColor *endGradientColor;
+@property (nonatomic, GC_STRONG) UIColor *startGradientColor __deprecated;
+@property (nonatomic, GC_STRONG) UIColor *endGradientColor __deprecated;
 
 /**
  * labelBackgroundColor's Priority > gradientColors
@@ -223,6 +223,7 @@ extern CGFloat const LabelVerticalPadding;
  * Limit TagLabel's max width, default is CGRectGetWidth([UIScreen mainScreen].bounds)
  */
 @property (assign) CGFloat maxWidth;
++ (NSArray*)defaultGradoentColors;
 + (GCTagLabel*)tagLabelWithReuseIdentifier:(NSString*)identifier;
 - (id)initReuseIdentifier:(NSString*)identifier;
 - (void)setLabelText:(NSString*)text accessoryType:(GCTagLabelAccessoryType)type;

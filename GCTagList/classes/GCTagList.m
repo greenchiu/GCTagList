@@ -748,14 +748,23 @@
 #pragma mark -
 #pragma mark ===GCTagLabel===
 
-#define COLOR_WATE_BLUE [UIColor colorWithString:@"#E0EAF4e8"]
+#define COLOR_WATER_BLUE [UIColor colorWithString:@"#E0EAF4"]
 
 #define DEFAULT_LABEL_BACKGROUND_COLOR [UIColor lightGrayColor]
 #define DEFAULT_LABEL_TEXT_COLOR [UIColor blackColor]
 #define DEFAULT_LABEL_GRADIENT_START_COLOR [UIColor lightGrayColor]
 #define DEFAULT_LABEL_GRADIENT_END_COLOR [UIColor whiteColor]
 
-#define DEFAULT_LABEL_GRANITEN_COLORS @[ (id)COLOR_WATE_BLUE.CGColor, (id)[COLOR_WATE_BLUE darken:.3f].CGColor, (id)[UIColor whiteColor].CGColor]
+#define DEFAULT_LABEL_GRANITEN_COLORS @[ COLOR_WATER_BLUE, [COLOR_WATER_BLUE lighten:.3f], [UIColor whiteColor]]
+
+//#define DEFAULT_LABEL_SELECTED_GRANITEN_COLORS @[ [COLOR_WATER_BLUE darken:.4f], \
+//                                                  [COLOR_WATER_BLUE darken:.4f], \
+//                                                  [UIColor whiteColor] ]
+
+#define DEFAULT_LABEL_SELECTED_GRANITEN_COLORS @[ [COLOR_WATER_BLUE darken:.1f], \
+                                                  [COLOR_WATER_BLUE darken:.1f], \
+                                                  [COLOR_WATER_BLUE darken:.1f] ]
+
 
 #define DEFAULT_LABEL_GRANDIEN_LOCATIONS @[@0, @0.4, @1];
 
@@ -815,13 +824,19 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 @property (nonatomic, GC_STRONG) UIButton* accessoryButton;
 @property (nonatomic, GC_STRONG) NSString* privateReuseIdentifier;
 
-@property (nonatomic, GC_STRONG) UIColor *selectedStartGrandientColor;
-@property (nonatomic, GC_STRONG) UIColor *selectedEndGrandientColor;
+@property (nonatomic, GC_STRONG) UIColor *selectedStartGrandientColor __deprecated;
+@property (nonatomic, GC_STRONG) UIColor *selectedEndGrandientColor __deprecated;
 
 @property (assign) NSInteger index;
+
+@property (assign) BOOL isUsedGradient;
 @end
 
 @implementation GCTagLabel
+
++ (NSArray*)defaultGradoentColors {
+    return DEFAULT_LABEL_GRANITEN_COLORS;
+}
 
 + (GCTagLabel*)tagLabelWithReuseIdentifier:(NSString *)identifier {
     GCTagLabel *tag = GC_AUTORELEASE([[GCTagLabel alloc] initReuseIdentifier:identifier]);
@@ -858,22 +873,15 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         self.fitSize = CGSizeMake(self.maxWidth, 1500);
         self.labelTextColor = DEFAULT_LABEL_TEXT_COLOR;
         
-//        self.labelBackgrounColor = [UIColor colorWithString:@"#E0EAF4"];
-        
-//        UIColor* waterBlue = [UIColor colorWithString:@"#E0EAF4"];
-//        NSArray* colors = @[ waterBlue, [waterBlue darken:.2f], [UIColor whiteColor]];
-//        self.gradientColors = colors;
-//        self.gradientLocations = @[@0, @0.65, @1.f];
-        
         self.gradientLayer = [CAGradientLayer layer];
         self.gradientLayer.cornerRadius = LABEL_CORNER_RADIUS;
         self.gradientLayer.borderWidth = 0.f;
         
-        self.endGradientColor = DEFAULT_LABEL_BACKGROUND_COLOR;
-        self.startGradientColor = [UIColor whiteColor];
-        
-        self.selectedStartGrandientColor = [self.startGradientColor lighten:.1f];
-        self.selectedEndGrandientColor = [self.endGradientColor lighten:.1f];
+//        self.endGradientColor = DEFAULT_LABEL_BACKGROUND_COLOR;
+//        self.startGradientColor = [UIColor whiteColor];
+//        
+//        self.selectedStartGrandientColor = [self.startGradientColor lighten:.1f];
+//        self.selectedEndGrandientColor = [self.endGradientColor lighten:.1f];
         
         [self.layer insertSublayer:self.gradientLayer atIndex:0];
         
@@ -926,22 +934,105 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     if(!self.selectedEnabled) {
         return;
     }
-    NSArray* colorsArray = !selected ?
-    [NSArray arrayWithObjects:(id)[self.startGradientColor CGColor], (id)[self.endGradientColor CGColor], nil] :
-    [NSArray arrayWithObjects:(id)[self.selectedStartGrandientColor CGColor], (id)[self.selectedEndGrandientColor CGColor], nil] ;
     
-    if(!animated) {
-        [CATransaction begin];
-        [CATransaction setValue:(id)kCFBooleanTrue
-                         forKey:kCATransactionDisableActions];
-        self.gradientLayer.colors = colorsArray;
-        [CATransaction commit];
+    NSMutableArray *gradientColors = nil;
+    NSArray *tempLocations = nil;
+    
+    gradientColors = [NSMutableArray arrayWithCapacity:0];
+    if(!selected) {
+        if(self.isUsedGradient) {
+            for (UIColor *color in self.gradientColors) {
+                [gradientColors addObject:(id)color.CGColor];
+            }
+            tempLocations = self.gradientLocations;
+            if(!tempLocations)
+                tempLocations = DEFAULT_LABEL_GRANDIEN_LOCATIONS;
+        } else {
+            UIColor* temp = self.labelBackgroundColor ? self.labelBackgroundColor : COLOR_WATER_BLUE;
+            for (int index = 0; index < 3; index++) {
+                [gradientColors addObject:(id)temp.CGColor];
+            }
+            
+        }
     } else {
-        [CATransaction begin];
-        [CATransaction setAnimationDuration:.3f];
-        self.gradientLayer.colors = colorsArray;
-        [CATransaction commit];
+        for (UIColor* color in DEFAULT_LABEL_SELECTED_GRANITEN_COLORS) {
+            [gradientColors addObject:(id)color.CGColor];
+        }
     }
+    [self drawTagLabelUseGradientColors:gradientColors locations:tempLocations animated:animated];
+    
+//    [CATransaction begin];
+//    if(!animated) {
+//        [CATransaction setValue:(id)kCFBooleanTrue
+//                         forKey:kCATransactionDisableActions];
+//    } else
+//        [CATransaction setAnimationDuration:.3f];
+//    self.gradientLayer.colors = gradientColors;
+//    self.gradientLayer.locations = tempLocations;
+//    [CATransaction commit];
+
+    
+    
+//    if(self.isUsedGradient) {
+//        if(!selected) {
+//            NSMutableArray *gradientColors = [NSMutableArray arrayWithCapacity:self.gradientColors.count];
+//            for (UIColor *color in self.gradientColors) {
+//                [gradientColors addObject:(id)color.CGColor];
+//            }
+//            tempLocations = self.gradientLocations;
+//            if(!tempLocations)
+//                tempLocations = DEFAULT_LABEL_GRANDIEN_LOCATIONS;
+//        } else {
+//            for (UIColor* color in DEFAULT_LABEL_SELECTED_GRANITEN_COLORS) {
+//                [gradientColors addObject:(id)color.CGColor];
+//            }
+//        }
+//        
+//    } else {
+//        UIColor* unSelectcolor = self.labelBackgroundColor ? self.labelBackgroundColor : COLOR_WATER_BLUE;
+//        
+//        
+//        [self drawTagLabelUseLabelBackgroundColor:selected ? [UIColor blueColor] : unSelectcolor
+//                                         animated:animated];
+//    }
+//    [self drawTagLabelUseGradientColors:gradientColors locations:tempLocations animated:animated];
+//    NSArray* colorsArray = !selected ?
+//    [NSArray arrayWithObjects:(id)[self.startGradientColor CGColor], (id)[self.endGradientColor CGColor], nil] :
+//    [NSArray arrayWithObjects:(id)[self.selectedStartGrandientColor CGColor], (id)[self.selectedEndGrandientColor CGColor], nil] ;
+    
+//    NSLog(@"%@", colorsArray);
+    
+//    self.layer.backgroundColor = [UIColor clearColor].CGColor;
+    
+//    NSMutableArray *gradientColors = [NSMutableArray arrayWithCapacity:3];
+//    NSArray* dependColors = selected ? DEFAULT_LABEL_SELECTED_GRANITEN_COLORS : DEFAULT_LABEL_GRANITEN_COLORS;
+//    for (UIColor *color in dependColors) {
+//        [gradientColors addObject:(id)color.CGColor];
+//    }
+//
+//    
+//    [CATransaction begin];
+//    if(!animated) {
+//        [CATransaction setValue:(id)kCFBooleanTrue
+//                         forKey:kCATransactionDisableActions];
+//    } else
+//        [CATransaction setAnimationDuration:.3f];
+//    self.gradientLayer.colors = gradientColors;
+//    [CATransaction commit];
+    
+    
+//    if(!animated) {
+//        [CATransaction begin];
+//        [CATransaction setValue:(id)kCFBooleanTrue
+//                         forKey:kCATransactionDisableActions];
+//        self.gradientLayer.colors = colorsArray;
+//        [CATransaction commit];
+//    } else {
+//        [CATransaction begin];
+//        [CATransaction setAnimationDuration:.3f];
+//        self.gradientLayer.colors = colorsArray;
+//        [CATransaction commit];
+//    }
 }
 
 - (void)didMoveToSuperview {
@@ -1071,10 +1162,11 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     viewFrame.size.width = viewWidth;
     viewFrame.size.height = textSize.height;
     self.frame = viewFrame;
+    self.gradientLayer.frame = self.bounds;
     
+    self.isUsedGradient = NO;
     if(!self.labelBackgroundColor && !self.gradientColors) {
-//        self.backgroundColor = COLOR_WATE_BLUE;
-        [self drawTagLabelUseLabelBackgroundColor:COLOR_WATE_BLUE animated:NO];
+        [self drawTagLabelUseLabelBackgroundColor:COLOR_WATER_BLUE animated:NO];
         return;
     }
     
@@ -1096,10 +1188,12 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         tempLocations = self.gradientLocations;
     
     } else if(self.gradientColors.count < 2) {
-        [self drawTagLabelUseLabelBackgroundColor:COLOR_WATE_BLUE animated:NO];
+        [self drawTagLabelUseLabelBackgroundColor:COLOR_WATER_BLUE animated:NO];
         return;
     }
-
+    
+    self.isUsedGradient = YES;
+    
     if(!tempLocations)
         tempLocations = DEFAULT_LABEL_GRANDIEN_LOCATIONS;
     
@@ -1115,11 +1209,27 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 }
 
 - (void)drawTagLabelUseLabelBackgroundColor:(UIColor *)color animated:(BOOL)animated {
-    self.gradientLayer.colors = nil;
+//    self.gradientLayer.colors = nil;
+    
+//
+//    if(!animated) {
+//        [CATransaction begin];
+//        [CATransaction setValue:(id)kCFBooleanTrue
+//                         forKey:kCATransactionDisableActions];
+//        self.layer.backgroundColor = color.CGColor;
+//        [CATransaction commit];
+//    }
+//    else {
+//        [CATransaction begin];
+//        [CATransaction setAnimationDuration:.3f];
+//        self.layer.backgroundColor = color.CGColor;
+//        [CATransaction commit];
+//    }
+
     
     
     [CATransaction begin];
-    if(animated) {
+    if(!animated) {
         [CATransaction setValue:(id)kCFBooleanTrue
                          forKey:kCATransactionDisableActions];
     }
@@ -1132,15 +1242,17 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 }
 
 - (void)drawTagLabelUseGradientColors:(NSArray *)colors locations:(NSArray *)locations animated:(BOOL)animated {
+//    self.layer.backgroundColor = [UIColor blueColor].CGColor;
     [CATransaction begin];
-    if(animated) {
+    if(!animated) {
         [CATransaction setValue:(id)kCFBooleanTrue
                          forKey:kCATransactionDisableActions];
     }
-    else
+    else {
         [CATransaction setAnimationDuration:.3f];
+    }
     
-    self.gradientLayer.frame = self.bounds;
+    self.layer.backgroundColor = [UIColor clearColor].CGColor;
     self.gradientLayer.colors = colors;
     self.gradientLayer.locations = locations;
     [CATransaction commit];
