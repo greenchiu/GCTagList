@@ -99,10 +99,10 @@
 //    self.tagNames[index+1] = @"Girls' Generation";
 //    [tagList reloadTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
-//    [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
-//    [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
+    [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
+    [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
 //    [tagList insertTagLabelWithRange:NSMakeRange(index, 2)];
-//    [tagList insertTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
+    [tagList insertTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
 //    [tagList reloadData];
 }

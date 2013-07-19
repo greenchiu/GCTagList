@@ -11,8 +11,41 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
 
 ##What's new
 
-* assign custom label's start and end gradient color.
-* support reload/delete insert with animation.
+* assign custom label's start and end gradient color. [before v1.2]
+* you can custom the label's gradient colors and color locations. [after v1.1]
+
+```Objective-C
+
+/**
+ * labelBackgroundColor's Priority > gradientColors,
+ * if labelBackgroundColor and gradientColors all nil, 
+ * will use default color #E0EAF4
+ */
+@property (nonatomic, GC_STRONG) UIColor *labelBackgroundColor;
+
+/**
+ * if gradientColors's count is less 2, will use default labelBackgroundColor;
+ */
+@property (nonatomic, GC_STRONG) NSArray *gradientColors; ///< ...
+@property (nonatomic, GC_STRONG) NSArray *gradientLocations; ///< can be nil …
+
+```
+
+__There are two property has been depreceated__
+
+```Objective-C
+@property (nonatomic, GC_STRONG) UIColor *startGradientColor __deprecated;
+@property (nonatomic, GC_STRONG) UIColor *endGradientColor __deprecated;
+
+```
+
+## Features
+
+* setGradientColors & GradientLoacations (for GradientColors) [at] v1.2
+* support MaxRow.
+* TagLabel could set not show selectedState. (selectedEnabled)
+* reload/delete/insert with range.
+
 
 ```Objective-C   
 - (void)reloadTagLabelWithRange:(NSRange)range withAnimation:(BOOL)animated;
@@ -21,12 +54,6 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
 ```
 
 I try to imitate UITableView's way - @greenchiu
-
-## Features
-
-* support MaxRow.
-* TagLabel could set not show selectedState. (selectedEnabled)
-* reload/delete/insert with range.
 
 ##Supports
 

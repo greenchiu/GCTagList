@@ -197,7 +197,9 @@ extern CGFloat const LabelVerticalPadding;
 @property (nonatomic, GC_STRONG) UIColor *endGradientColor __deprecated;
 
 /**
- * labelBackgroundColor's Priority > gradientColors
+ * labelBackgroundColor's Priority > gradientColors,
+ * if labelBackgroundColor and gradientColors all nil,
+ * will use default color #E0EAF4
  */
 @property (nonatomic, GC_STRONG) UIColor *labelBackgroundColor;
 
