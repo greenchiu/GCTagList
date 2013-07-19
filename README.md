@@ -9,7 +9,7 @@ GCTagList like iOS Mail app's sender or recivers tags.
 ##Installation
 Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`.
 
-##What's new
+##What's new 
 
 * assign custom label's start and end gradient color. [before v1.2]
 * you can custom the label's gradient colors and color locations. [after v1.1]
@@ -28,7 +28,6 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
  */
 @property (nonatomic, GC_STRONG) NSArray *gradientColors; ///< ...
 @property (nonatomic, GC_STRONG) NSArray *gradientLocations; ///< can be nil …
-
 ```
 
 __There are two property has been depreceated__
@@ -36,12 +35,11 @@ __There are two property has been depreceated__
 ```Objective-C
 @property (nonatomic, GC_STRONG) UIColor *startGradientColor __deprecated;
 @property (nonatomic, GC_STRONG) UIColor *endGradientColor __deprecated;
-
 ```
 
 ## Features
 
-* setGradientColors & GradientLoacations (for GradientColors) [at] v1.2
+* custom the label gradient colors and colors locations (for GradientColors) [after] v1.1
 * support MaxRow.
 * TagLabel could set not show selectedState. (selectedEnabled)
 * reload/delete/insert with range.
