@@ -97,12 +97,17 @@
 }
 
 - (void)awakeFromNib {
+    
     self.rowMaxWidth = CGRectGetWidth(self.frame);
     self.nowSelected = NSNotFound;
     self.firstRowLeftMargin = 0.f;
     self.backgroundColor = [UIColor clearColor];
     self.visibleSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
     self.reuseSet = GC_AUTORELEASE([[NSMutableDictionary alloc] init]);
+    
+    if(self.dataSource) {
+        [self reloadData];
+    }
 }
 
 - (id)init {
@@ -263,10 +268,9 @@
     if(![self checkImplementDataSourceRequireMehtod])
         return;
     
-    
     NSInteger oldCount = [self.visibleSet count];
     
-    NSMutableArray* tempAry = [NSMutableArray arrayWithCapacity:oldCount-range.length];
+    NSMutableArray* tempAry = [NSMutableArray arrayWithCapacity:0];
     for (int i = range.location; i < oldCount; i++) {
         [tempAry addObject:[self tagLabelAtIndex:i]];
     }
@@ -878,6 +882,11 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     return self;
 }
 
+- (void)setLabelText:(NSString *)text {
+    [self setLabelText:text
+         accessoryType:GCTagLabelAccessoryNone];
+}
+
 - (void)setLabelText:(NSString *)text accessoryType:(GCTagLabelAccessoryType)type {
     self.backgroundColor = [UIColor clearColor];
     self.accessoryType = type;
@@ -947,7 +956,8 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
             [gradientColors addObject:(id)color.CGColor];
         }
     }
-    [self drawTagLabelUseGradientColors:gradientColors locations:tempLocations animated:animated];
+    [self drawTagLabelUseGradientColors:gradientColors
+                              locations:tempLocations animated:animated];
 }
 
 - (void)didMoveToSuperview {
@@ -1092,7 +1102,8 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     if(!tempLocations)
         tempLocations = DEFAULT_LABEL_GRANDIEN_LOCATIONS;
     
-    [self drawTagLabelUseGradientColors:gradientColors locations:tempLocations animated:NO];
+    [self drawTagLabelUseGradientColors:gradientColors
+                              locations:tempLocations animated:NO];
 }
 
 - (void)drawTagLabelUseLabelBackgroundColor:(UIColor *)color animated:(BOOL)animated {

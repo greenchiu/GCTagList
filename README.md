@@ -11,6 +11,7 @@ Simple copy over the `classes` folder and `assets` folder into your project and 
 
 ##What's new 
 
+* support xib. [after v1.2]
 * assign custom label's start and end gradient color. [before v1.2]
 * you can custom the label's gradient colors and color locations. [after v1.1]
 

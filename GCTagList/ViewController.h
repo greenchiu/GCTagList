@@ -10,5 +10,5 @@
 #import "GCTagList.h"
 
 @interface ViewController : UIViewController
-@property (nonatomic, strong) IBOutlet GCTagList *nibTagList;
+@property (nonatomic, GC_STRONG) IBOutlet GCTagList *nibTagList;
 @end

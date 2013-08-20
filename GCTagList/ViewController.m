@@ -17,35 +17,30 @@
 
 @implementation ViewController
 
+- (void)loadView {
+    self.tagNames = [NSMutableArray arrayWithArray:ARY];
+    [super loadView];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.tagNames = [NSMutableArray arrayWithArray:ARY];
+    /**
+     * the firstRowLeftMargin default is zero.
+     * the xib did not support the inspector to set custom view's property, so 
+     * if you need this setting, set it and call reloadData after.
+     */
+    self.nibTagList.firstRowLeftMargin = 30.f;
+    [self.nibTagList reloadData];
     
-//    GCTagLabel* tagLabel0 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
-//    [tagLabel0 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryArrowSign];
-//    [self.view addSubview:tagLabel0];
-//    
-//    GCTagLabel* tagLabel1 = [GCTagLabel tagLabelWithReuseIdentifier:@"test"];
-//    tagLabel1.maxWidth = 60.f;
-//    [tagLabel1 setLabelText:@"Green Chiu" accessoryType:GCTagLabelAccessoryNone];
-//    
-//    CGRect frame = tagLabel1.frame;
-//    frame.origin.y = 50;
-//    tagLabel1.frame = frame;
-//    [self.view addSubview:tagLabel1];
-    
-//    NSLog(@"heightOfRows:[%d rows]:[%.1f]",2, [GCTagList heightOfRows:1]);
-    
-    
+    /*
     GCTagList* taglist = [[[GCTagList alloc] initWithFrame:CGRectMake(0, 180, 320, 200)] autorelease];
-//    taglist.firstRowLeftMargin = 80.f;
+    taglist.firstRowLeftMargin = 80.f;
     taglist.delegate = self;
     taglist.dataSource = self;
     [self.view addSubview:taglist];
     [taglist reloadData];
-    
-    
+     */
 }
 
 - (NSInteger)numberOfTagLabelInTagList:(GCTagList *)tagList {
@@ -59,52 +54,64 @@
     GCTagLabel* tag = [tagList dequeueReusableTagLabelWithIdentifier:identifier];
     if(!tag) {
         tag = [GCTagLabel tagLabelWithReuseIdentifier:identifier];
-//        tag.startGradientColor = [UIColor colorWithString:@"e8e8e8"];
-//        tag.endGradientColor = [UIColor colorWithRed:84/255.f green:164/255.f blue:222/255.f alpha:1.f];
-//        NSLog(@"%@", tag.endGradientColor);
-        
+
         tag.gradientColors = [GCTagLabel defaultGradoentColors];
         
         [tag setCornerRadius:6.f];
     }
     
     NSString* labelText = self.tagNames[index];
+    
+    /**
+     * you can change the AccrssoryType with method setLabelText:accessoryType:
+     * or with no accessoryButton with method setLabelText:
+     */
+    
+    /* way 1
     GCTagLabelAccessoryType type = GCTagLabelAccessoryCrossSign;
     [tag setLabelText:labelText
         accessoryType:type];
+     */
+    
+    //way 2
+    [tag setLabelText:labelText];
     
     return tag;
 }
 
 - (void)tagList:(GCTagList *)tagList accessoryButtonTappedAtIndex:(NSInteger)index {
-//    NSLog(@"%s", __func__);
-//    [self.tagNames removeObjectAtIndex:index];
-    
-//    [self.tagNames removeObjectAtIndex:index];
-//    [self.tagNames removeObjectAtIndex:index];
-//
-    
-//    NSInteger allCount = [self.tagNames count];
-//    [self.tagNames removeObjectsInRange:NSMakeRange(index, 2)];
-//    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2)];
-    
-//    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
-//    NSLog(@"%@", self.tagNames);
-//    self.tagNames[index] = @"Kim Jong Kook";
-//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1)];
-//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1) withAnimation:YES];
+
+    /**
+     * this is the delete method how to use.
+     */
+    /**
+    [self.tagNames removeObjectsInRange:NSMakeRange(index, 2)];
+    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2)];
+    [tagList deleteTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
+     */
     
     
-//    self.tagNames[index] = @"Kim Jong Kook";
-//    self.tagNames[index+1] = @"Girls' Generation";
-//    [tagList reloadTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
+    /**
+     * this is the reload method how to use.
+     */
+    /**
+    self.tagNames[index] = @"Kim Jong Kook";
+    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1)];
+    [tagList reloadTagLabelWithRange:NSMakeRange(index, 1) withAnimation:YES];
     
+    self.tagNames[index] = @"Kim Jong Kook";
+    self.tagNames[index+1] = @"Girls' Generation";
+    [tagList reloadTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
+    */
+    
+    /**
+     * this is the insert method how to use.
+     */
     [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
     [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
 //    [tagList insertTagLabelWithRange:NSMakeRange(index, 2)];
     [tagList insertTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
-//    [tagList reloadData];
 }
 
 - (void)tagList:(GCTagList *)taglist didChangedHeight:(CGFloat)newHeight {

@@ -9,8 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define gctaglist_version @"1.2"
-#define update_date @"2013.07.19 16:26 +0800"
+#define gctaglist_version @"1.2.1"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
@@ -119,9 +118,9 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 #pragma mark -
 #pragma mark GCTagList
 @interface GCTagList : UIView
-@property (nonatomic, GC_WEAK) id<GCTagListDelegate> delegate;
-@property (nonatomic, GC_WEAK) id<GCTagListDataSource> dataSource;
-@property (assign) CGFloat firstRowLeftMargin;
+@property (nonatomic, GC_WEAK) IBOutlet id<GCTagListDelegate> delegate;
+@property (nonatomic, GC_WEAK) IBOutlet id<GCTagListDataSource> dataSource;
+@property (nonatomic) CGFloat firstRowLeftMargin;
 
 /**
  * 取得一個可以被Reuse的TagLabel實體, 如果沒有則回傳nil.
@@ -228,6 +227,11 @@ extern CGFloat const LabelVerticalPadding;
 + (NSArray*)defaultGradoentColors;
 + (GCTagLabel*)tagLabelWithReuseIdentifier:(NSString*)identifier;
 - (id)initReuseIdentifier:(NSString*)identifier;
+
+/**
+ * setLabelText, and the accessoryType is GCTagLabelAccessoryNone
+ */
+- (void)setLabelText:(NSString*)text;
 - (void)setLabelText:(NSString*)text accessoryType:(GCTagLabelAccessoryType)type;
 - (void)setSelected:(BOOL)selected animation:(BOOL)animated;
 - (void)setCornerRadius:(CGFloat)cornerRadius; // default is 12.f
