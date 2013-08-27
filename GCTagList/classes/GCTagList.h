@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define gctaglist_version @"1.2.1"
+#define gctaglist_version @"1.3"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
@@ -120,6 +120,11 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 @interface GCTagList : UIView
 @property (nonatomic, GC_WEAK) IBOutlet id<GCTagListDelegate> delegate;
 @property (nonatomic, GC_WEAK) IBOutlet id<GCTagListDataSource> dataSource;
+
+/**
+ * new property for TagLabel's font to use custom font, and the font is same in the same taglist 
+ */
+@property (nonatomic, GC_STRONG) UIFont* labelFont;
 @property (nonatomic) CGFloat firstRowLeftMargin;
 
 /**
@@ -192,8 +197,6 @@ extern CGFloat const LabelVerticalPadding;
 @interface GCTagLabel : UIView
 @property (nonatomic, readonly, copy) NSString* reuseIdentifier;
 @property (nonatomic, GC_STRONG) UIColor *labelTextColor;
-@property (nonatomic, GC_STRONG) UIColor *startGradientColor __deprecated;
-@property (nonatomic, GC_STRONG) UIColor *endGradientColor __deprecated;
 
 /**
  * labelBackgroundColor's Priority > gradientColors,
@@ -206,7 +209,6 @@ extern CGFloat const LabelVerticalPadding;
  * if gradientColors's count is less 2, will use default labelBackgroundColor;
  */
 @property (nonatomic, GC_STRONG) NSArray *gradientColors; ///< ...
-
 @property (nonatomic, GC_STRONG) NSArray *gradientLocations; ///< ...
 
 @property (assign) GCTagLabelAccessoryType accessoryType;

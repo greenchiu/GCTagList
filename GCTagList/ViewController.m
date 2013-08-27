@@ -31,6 +31,16 @@
      * if you need this setting, set it and call reloadData after.
      */
     self.nibTagList.firstRowLeftMargin = 30.f;
+    
+    /**
+     * labelfont default is nil, if you want change the font,
+     * you could use this property, this could keep the font with your taglabel.  
+     * use this property with xib, you should call reloadData.
+     * by Green at 08/28/2013.
+     */
+    
+    //self.nibTagList.labelFont = [UIFont systemFontOfSize:16.f];
+    
     [self.nibTagList reloadData];
     
     /*
@@ -109,7 +119,6 @@
      */
     [self.tagNames insertObject:@"Girls' Generation" atIndex:index];
     [self.tagNames insertObject:@"TaeTiSeo" atIndex:index];
-//    [tagList insertTagLabelWithRange:NSMakeRange(index, 2)];
     [tagList insertTagLabelWithRange:NSMakeRange(index, 2) withAnimation:YES];
     
 }
@@ -123,17 +132,16 @@
 }
 
 - (void)tagList:(GCTagList *)taglist didSelectedLabelAtIndex:(NSInteger)index {
-//    NSLog(@"%.0f", [taglist tagLabelAtIndex:index].maxWidth);
-//    NSLog(@"selectIndex:%d", index);
     [taglist deselectedLabelAtIndex:index animated:YES];
 }
 
-//
-
+/**
+ * 
+ */
 //- (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList {
 //    return 1;
 //}
-//
+
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel {
     return GCTagLabelAccessoryArrowSign;
 }
