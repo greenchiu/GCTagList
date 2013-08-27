@@ -1028,7 +1028,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
                        constrainedToSize:self.fitSize
                            lineBreakMode:NSLineBreakByWordWrapping];
 
-    textSize.height += VERTICAL_PADDING * 2;
+    
     //===========
     CGFloat deviationValue = self.accessoryType != GCTagLabelAccessoryNone ? 24 : 0;
     BOOL needCorrection =( (textSize.width + deviationValue + HORIZONTAL_PADDING * 2) > self.maxWidth );
@@ -1042,6 +1042,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         textSize.height = defaultSize.height;
     }
     
+    textSize.height += VERTICAL_PADDING * 2;
     
     CGRect labelFrame;
     labelFrame.origin = CGPointMake(HORIZONTAL_PADDING, 0);
