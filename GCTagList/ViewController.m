@@ -39,7 +39,7 @@
      * by Green at 08/28/2013.
      */
     
-    //self.nibTagList.labelFont = [UIFont systemFontOfSize:16.f];
+    self.nibTagList.labelFont = [UIFont systemFontOfSize:18.f];
     
     [self.nibTagList reloadData];
     
@@ -77,14 +77,14 @@
      * or with no accessoryButton with method setLabelText:
      */
     
-    /* way 1
+    /* way 1 */
     GCTagLabelAccessoryType type = GCTagLabelAccessoryCrossSign;
     [tag setLabelText:labelText
         accessoryType:type];
-     */
+    
     
     //way 2
-    [tag setLabelText:labelText];
+    //[tag setLabelText:labelText];
     
     return tag;
 }

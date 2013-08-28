@@ -174,7 +174,7 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 
 @interface GCTagList (AbstractHeight)
 /**
- * Only support TagLabelAccessoryType = GCTagLabelAccessoryNone.
+ * Only support TagLabelAccessoryType = GCTagLabelAccessoryNone and default font 
  */
 + (NSInteger)rowOfTagListWithFirstRowLeftMargin:(CGFloat)leftMargin
                                     tagListWith:(CGFloat)tagListWith
@@ -182,10 +182,11 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
                                    tagLabelText:(NSArray*)texts;
 
 /**
- * 取得高度
  * get height of rows.
  */
 + (CGFloat)heightOfRows:(NSInteger)numberOfRow;
+
++ (CGFloat)heightOfRows:(NSInteger)numberOfRow font:(UIFont*)font;
 @end
 
 #pragma mark -

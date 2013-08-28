@@ -405,10 +405,10 @@
     CGFloat occupyHeight = CGRectGetHeight(tag.frame)+tag.frame.origin.y;
     
     NSInteger tempRow = 1;
-    CGFloat h = [GCTagList heightOfRows:tempRow];
+    CGFloat h = [GCTagList heightOfRows:tempRow font:self.labelFont];
     while (h != occupyHeight) {
         tempRow++;
-        h = [GCTagList heightOfRows:tempRow];
+        h = [GCTagList heightOfRows:tempRow font:self.labelFont];
     }
     
     row = tempRow;
@@ -742,9 +742,18 @@
     return row;
 }
 
-+ (CGFloat)heightOfRows:(NSInteger)numberOfRow {
++ (CGFloat) heightOfRows:(NSInteger)numberOfRow {
+    return [self heightOfRows:numberOfRow
+                         font:[UIFont systemFontOfSize:LabelDefaultFontSize]];
+}
+
++ (CGFloat)heightOfRows:(NSInteger)numberOfRow font:(UIFont*)font {
     NSString* text = @"I'm Sample.";
-    CGSize textSize = [text sizeWithFont:[UIFont fontWithName:@"HelveticaNeue" size:LabelDefaultFontSize]
+    
+    if(!font) {
+        font = [UIFont systemFontOfSize:LabelDefaultFontSize];
+    }
+    CGSize textSize = [text sizeWithFont:font
                        constrainedToSize:CGSizeMake(9999, 9999)
                            lineBreakMode:NSLineBreakByWordWrapping];
     
@@ -979,6 +988,14 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 - (void)setCornerRadius:(CGFloat)cornerRadius {
     self.gradientLayer.cornerRadius = cornerRadius;
     self.layer.cornerRadius = cornerRadius;
+}
+
+- (NSString*)description {
+    NSString* description = [NSString stringWithFormat:@"<GCTagLabel:%p, index:%d, bounds:%@>",
+                             self,
+                             _index,
+                             [NSValue valueWithCGRect:self.bounds]];
+    return description;
 }
 
 @end

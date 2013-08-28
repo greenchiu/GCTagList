@@ -9,6 +9,16 @@ GCTagList like iOS Mail app's sender or recivers tags.
 ##Installation
 Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`.
 
+###Cocoapods
+
+use GCTagList with Cocoapods
+
+```
+pod 'GCTagList', '~> 1.2.1'
+```
+
+I will send pull request for cocoapods with v1.3
+
 ##What's new 
 
 * custom font for TagList, use the property `labelFont` with __GCTagList__.
@@ -55,6 +65,11 @@ __There are two property has been depreceated__
 ```
 
 I try to imitate UITableView's way - @greenchiu
+
+##next version(1.4) will support
+
+* custom accessoryButton.
+* more accessoryType for TagLabel.
 
 ##Supports
 
@@ -157,7 +172,7 @@ implementation the GCTagListDataSource and call the public method `reloadData`
 
 Use this control in your apps? Let me know!
 
-Copyright (c) 2013 Green Chiu, http://greenchiu.github.com/ Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
+Copyright (c) 2013  Green Chiu, http://greenchiu.github.com/ Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ‘Software’), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
