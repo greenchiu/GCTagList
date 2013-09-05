@@ -7,24 +7,30 @@ GCTagList like iOS Mail app's sender or recivers tags.
 ![](Screenshot2.png)
 
 ##Installation
-Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`.
+
+#### before v1.3.1  
+
+Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`, and import the `GCTagList.h`.
+
+#### v1.3.1
 
 ###Cocoapods
 
 use GCTagList with Cocoapods
 
 ```
-pod 'GCTagList', '~> 1.2.1'
+pod 'GCTagList', '~> 1.3'
 ```
 
-I will send pull request for cocoapods with v1.3
-
 ##What's new 
+
+
+> I split up the class to three parts, `GCTagList`、`GCTagLabel` and `UIColor+Uitiles` with v1.3.1; I hope this way could more easy to read and maintain.
+
 
 * custom font for TagList, use the property `labelFont` with __GCTagList__.
 * support xib. [after v1.2]
 * you can custom the label's gradient colors and color locations. [after v1.1]
-* ~~assign custom label's start and end gradient color.~~
 
 
 ```Objective-C
@@ -41,13 +47,6 @@ I will send pull request for cocoapods with v1.3
  */
 @property (nonatomic, GC_STRONG) NSArray *gradientColors; ///< ...
 @property (nonatomic, GC_STRONG) NSArray *gradientLocations; ///< can be nil …
-```
-
-__There are two property has been depreceated__
-
-```Objective-C
-@property (nonatomic, GC_STRONG) UIColor *startGradientColor __deprecated;
-@property (nonatomic, GC_STRONG) UIColor *endGradientColor __deprecated;
 ```
 
 ## Features
@@ -167,6 +166,7 @@ implementation the GCTagListDataSource and call the public method `reloadData`
 ##Reference
 
 * [DWTagList](https://github.com/domness/DWTagList)
+* [ColorUtils](https://github.com/nicklockwood/ColorUtils)
 
 ##License
 

@@ -22,6 +22,7 @@
 		18A0781316DE08D3005CBA7A /* GCTagList.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0781016DE08D3005CBA7A /* GCTagList.m */; };
 		18A0781516DE0966005CBA7A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18A0781416DE0966005CBA7A /* QuartzCore.framework */; };
 		C2F1E61117D8C9A20013C097 /* UIColor+Uitilies.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F1E61017D8C9A20013C097 /* UIColor+Uitilies.m */; };
+		C2F1E61417D8CBC80013C097 /* GCTagLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F1E61317D8CBC80013C097 /* GCTagLabel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,8 @@
 		18A0781416DE0966005CBA7A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		C2F1E60F17D8C9A20013C097 /* UIColor+Uitilies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Uitilies.h"; sourceTree = "<group>"; };
 		C2F1E61017D8C9A20013C097 /* UIColor+Uitilies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Uitilies.m"; sourceTree = "<group>"; };
+		C2F1E61217D8CBC80013C097 /* GCTagLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCTagLabel.h; sourceTree = "<group>"; };
+		C2F1E61317D8CBC80013C097 /* GCTagLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCTagLabel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +137,8 @@
 			children = (
 				18A0780F16DE08D3005CBA7A /* GCTagList.h */,
 				18A0781016DE08D3005CBA7A /* GCTagList.m */,
+				C2F1E61217D8CBC80013C097 /* GCTagLabel.h */,
+				C2F1E61317D8CBC80013C097 /* GCTagLabel.m */,
 				C2F1E60F17D8C9A20013C097 /* UIColor+Uitilies.h */,
 				C2F1E61017D8C9A20013C097 /* UIColor+Uitilies.m */,
 			);
@@ -212,6 +217,7 @@
 				18A0780116DE07F8005CBA7A /* ViewController.m in Sources */,
 				18A0781316DE08D3005CBA7A /* GCTagList.m in Sources */,
 				C2F1E61117D8C9A20013C097 /* UIColor+Uitilies.m in Sources */,
+				C2F1E61417D8CBC80013C097 /* GCTagLabel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

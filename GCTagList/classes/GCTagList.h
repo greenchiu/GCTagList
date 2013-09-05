@@ -7,9 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <QuartzCore/QuartzCore.h>
+#import "GCTagLabel.h"
 
-#define gctaglist_version @"1.3"
+#define gctaglist_version @"1.3.1"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
@@ -47,11 +47,7 @@
     #define GC_RETAIN(exp) [exp retain]
 #endif
 
-typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
-    GCTagLabelAccessoryNone,
-    GCTagLabelAccessoryCrossSign,
-    GCTagLabelAccessoryArrowSign
-};
+
 
 @class GCTagList, GCTagLabel;
 
@@ -93,13 +89,13 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
  * 在TagList中有多少個TagLabel.
  * how many count for taglist to display.
  */
-- (NSInteger)numberOfTagLabelInTagList:(GCTagList*)tagList;
+- (NSInteger)numberOfTagLabelInTagList:(GCTagList *)tagList;
 
 /**
  * 在TagList中的TagLabel.
  * the taglabel At index in the taglist.
  */
-- (GCTagLabel*)tagList:(GCTagList*)tagList tagLabelAtIndex:(NSInteger)index;
+- (GCTagLabel *)tagList:(GCTagList *)tagList tagLabelAtIndex:(NSInteger)index;
 
 @optional
 /**
@@ -124,20 +120,20 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 /**
  * new property for TagLabel's font to use custom font, and the font is same in the same taglist 
  */
-@property (nonatomic, GC_STRONG) UIFont* labelFont;
+@property (nonatomic, GC_STRONG) UIFont *labelFont;
 @property (nonatomic) CGFloat firstRowLeftMargin;
 
 /**
  * 取得一個可以被Reuse的TagLabel實體, 如果沒有則回傳nil.
  * get a taglabel, if the reuse set has no taglabel, return nil.
  */
-- (GCTagLabel*)dequeueReusableTagLabelWithIdentifier:(NSString*)identifier;
+- (GCTagLabel *)dequeueReusableTagLabelWithIdentifier:(NSString *)identifier;
 
 /**
  * 取得taglist第index位置上的taglabel
  * get taglabel at index of the taglist.
  */
-- (GCTagLabel*)tagLabelAtIndex:(NSInteger)index;
+- (GCTagLabel *)tagLabelAtIndex:(NSInteger)index;
 
 /**
  * 載入TagLabel並顯示TagList.
@@ -179,63 +175,14 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 + (NSInteger)rowOfTagListWithFirstRowLeftMargin:(CGFloat)leftMargin
                                     tagListWith:(CGFloat)tagListWith
                                tagLabelMaxWidth:(CGFloat)tagLabelMaxWidth
-                                   tagLabelText:(NSArray*)texts;
+                                   tagLabelText:(NSArray *)texts;
 
 /**
  * get height of rows.
  */
 + (CGFloat)heightOfRows:(NSInteger)numberOfRow;
 
-+ (CGFloat)heightOfRows:(NSInteger)numberOfRow font:(UIFont*)font;
++ (CGFloat)heightOfRows:(NSInteger)numberOfRow font:(UIFont *)font;
 @end
 
-#pragma mark -
-#pragma mark GCTagLabel
-extern CGFloat const LabelDefaultFontSize;
-extern CGFloat const LabelHorizontalPadding;
-extern CGFloat const LabelVerticalPadding;
 
-@interface GCTagLabel : UIView
-@property (nonatomic, readonly, copy) NSString* reuseIdentifier;
-@property (nonatomic, GC_STRONG) UIColor *labelTextColor;
-
-/**
- * labelBackgroundColor's Priority > gradientColors,
- * if labelBackgroundColor and gradientColors all nil,
- * will use default color #E0EAF4
- */
-@property (nonatomic, GC_STRONG) UIColor *labelBackgroundColor;
-
-/**
- * if gradientColors's count is less 2, will use default labelBackgroundColor;
- */
-@property (nonatomic, GC_STRONG) NSArray *gradientColors; ///< ...
-@property (nonatomic, GC_STRONG) NSArray *gradientLocations; ///< ...
-
-@property (assign) GCTagLabelAccessoryType accessoryType;
-@property (assign) BOOL selectedEnabled; // if YES, the taglabel could show selected state. default is YES.
-@property (readonly) BOOL selected;
-@property (assign) CGSize fitSize;
-
-/**
- * let the maxWidth equal to the taglist's width,
- * default is YES.
- */
-@property (assign) BOOL maxWidthFitToListWidth;
-
-/**
- * Limit TagLabel's max width, default is CGRectGetWidth([UIScreen mainScreen].bounds)
- */
-@property (assign) CGFloat maxWidth;
-+ (NSArray*)defaultGradoentColors;
-+ (GCTagLabel*)tagLabelWithReuseIdentifier:(NSString*)identifier;
-- (id)initReuseIdentifier:(NSString*)identifier;
-
-/**
- * setLabelText, and the accessoryType is GCTagLabelAccessoryNone
- */
-- (void)setLabelText:(NSString*)text;
-- (void)setLabelText:(NSString*)text accessoryType:(GCTagLabelAccessoryType)type;
-- (void)setSelected:(BOOL)selected animation:(BOOL)animated;
-- (void)setCornerRadius:(CGFloat)cornerRadius; // default is 12.f
-@end
