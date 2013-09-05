@@ -21,6 +21,7 @@
 		18A0781116DE08D3005CBA7A /* CGTagList.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 18A0780B16DE08D3005CBA7A /* CGTagList.bundle */; };
 		18A0781316DE08D3005CBA7A /* GCTagList.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0781016DE08D3005CBA7A /* GCTagList.m */; };
 		18A0781516DE0966005CBA7A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18A0781416DE0966005CBA7A /* QuartzCore.framework */; };
+		C2F1E61117D8C9A20013C097 /* UIColor+Uitilies.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F1E61017D8C9A20013C097 /* UIColor+Uitilies.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,8 @@
 		18A0780F16DE08D3005CBA7A /* GCTagList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCTagList.h; sourceTree = "<group>"; };
 		18A0781016DE08D3005CBA7A /* GCTagList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCTagList.m; sourceTree = "<group>"; };
 		18A0781416DE0966005CBA7A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		C2F1E60F17D8C9A20013C097 /* UIColor+Uitilies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Uitilies.h"; sourceTree = "<group>"; };
+		C2F1E61017D8C9A20013C097 /* UIColor+Uitilies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Uitilies.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +134,8 @@
 			children = (
 				18A0780F16DE08D3005CBA7A /* GCTagList.h */,
 				18A0781016DE08D3005CBA7A /* GCTagList.m */,
+				C2F1E60F17D8C9A20013C097 /* UIColor+Uitilies.h */,
+				C2F1E61017D8C9A20013C097 /* UIColor+Uitilies.m */,
 			);
 			path = classes;
 			sourceTree = "<group>";
@@ -206,6 +211,7 @@
 				18A077F816DE07F8005CBA7A /* AppDelegate.m in Sources */,
 				18A0780116DE07F8005CBA7A /* ViewController.m in Sources */,
 				18A0781316DE08D3005CBA7A /* GCTagList.m in Sources */,
+				C2F1E61117D8C9A20013C097 /* UIColor+Uitilies.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

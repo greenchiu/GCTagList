@@ -239,9 +239,3 @@ extern CGFloat const LabelVerticalPadding;
 - (void)setSelected:(BOOL)selected animation:(BOOL)animated;
 - (void)setCornerRadius:(CGFloat)cornerRadius; // default is 12.f
 @end
-
-@interface UIColor (Uitilies)
-+ (UIColor*)colorWithString:(NSString*)colorString;
-- (UIColor*)darken:(CGFloat)percent;
-- (UIColor*)lighten:(CGFloat)percent;
-@end
