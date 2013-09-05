@@ -8,11 +8,7 @@ GCTagList like iOS Mail app's sender or recivers tags.
 
 ##Installation
 
-#### before v1.3.1  
-
 Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`, and import the `GCTagList.h`.
-
-#### v1.3.1
 
 ###Cocoapods
 
