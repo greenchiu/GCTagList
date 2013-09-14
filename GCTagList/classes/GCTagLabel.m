@@ -40,7 +40,7 @@ CGFloat const LabelHorizontalPadding = HORIZONTAL_PADDING;
 CGFloat const LabelVerticalPadding = VERTICAL_PADDING;
 
 NSString * imageFontNameForType(GCTagLabelAccessoryType type) {
-    NSString* imageFontName;
+    NSString *imageFontName;
     
     switch (type) {
         case GCTagLabelAccessoryArrowSign:
@@ -114,11 +114,11 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     CGRect labelFrame;
     labelFrame.origin = CGPointMake(LabelHorizontalPadding, 0);
     CGRect buttonFrame = CGRectZero;
-    if(type != GCTagLabelAccessoryNone) {
+    if (type != GCTagLabelAccessoryNone) {
         CGPoint buttonPoint = CGPointZero;
         
         buttonPoint.x = textSize.width + LabelHorizontalPadding;
-        if(!needCorrection)
+        if (!needCorrection)
             buttonPoint.x -= 9;
         buttonPoint.y = (textSize.height - 24) / 2 ;
         
@@ -128,10 +128,12 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     labelFrame.size = textSize;
     
     CGFloat viewWidth;
-    if(!CGRectEqualToRect(buttonFrame, CGRectZero))
+    if (!CGRectEqualToRect(buttonFrame, CGRectZero)) {
         viewWidth = buttonFrame.origin.x + CGRectGetWidth(buttonFrame);
-    else
+    }
+    else {
         viewWidth = labelFrame.origin.x + CGRectGetWidth(labelFrame);
+    }
     
     viewWidth += LabelHorizontalPadding;
     //===========
@@ -166,7 +168,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 
 - (id)initReuseIdentifier:(NSString *)identifier {
     self = [super init];
-    if(self) {
+    if (self) {
         _selected = NO;
         self.maxWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
         self.maxWidthFitToListWidth = YES;
@@ -195,7 +197,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.backgroundColor = [UIColor clearColor];
     self.accessoryType = type;
     
-    if(!self.label) {
+    if (!self.label) {
         self.label = GC_AUTORELEASE([[UILabel alloc] init]);
         /**
          * this set the label's textAlignment equals to 1 because the UITextAlignment is for iOS < 6.0
@@ -210,17 +212,18 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.label.text = text;
     self.label.textColor = self.labelTextColor;
     
-    if(type == GCTagLabelAccessoryNone) {
+    if (type == GCTagLabelAccessoryNone) {
         [self.accessoryButton removeFromSuperview];
         self.accessoryButton = nil;
-    } else if (type != GCTagLabelAccessoryNone && !self.accessoryButton) {
+    }
+    else if (type != GCTagLabelAccessoryNone && !self.accessoryButton) {
         self.accessoryButton = GC_AUTORELEASE([[UIButton alloc] initWithFrame:
                                                CGRectMake(0, 0,
                                                           ACCESSORYVIEW_WIDTH, ACCESSORYVIEW_WIDTH)]);
         [self addSubview:self.accessoryButton];
     }
     
-    if(type!=GCTagLabelAccessoryNone) {
+    if (type!=GCTagLabelAccessoryNone) {
         [self.accessoryButton setImage:[UIImage imageNamed:imageFontNameForType(type)]
                               forState:UIControlStateNormal];
         self.accessoryButton.imageEdgeInsets = UIEdgeInsetsMake(0,
@@ -237,9 +240,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     return self.privateReuseIdentifier;
 }
 
-- (void)setSelected:(BOOL)selected animation:(BOOL)animated{
+- (void)setSelected:(BOOL)selected animation:(BOOL)animated {
     _selected = selected;
-    if(!self.selectedEnabled) {
+    if (!self.selectedEnabled) {
         return;
     }
     
@@ -263,7 +266,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
             
         }
     } else {
-        for (UIColor* color in DEFAULT_LABEL_SELECTED_GRANITEN_COLORS) {
+        for (UIColor *color in DEFAULT_LABEL_SELECTED_GRANITEN_COLORS) {
             [gradientColors addObject:(id)color.CGColor];
         }
     }
@@ -300,7 +303,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     CGRect labelFrame;
     labelFrame.origin = CGPointMake(HORIZONTAL_PADDING, 0);
     
-    if(self.accessoryType != GCTagLabelAccessoryNone) {
+    if (self.accessoryType != GCTagLabelAccessoryNone) {
         CGPoint buttonPoint = CGPointZero;
         
         buttonPoint.x = textSize.width + HORIZONTAL_PADDING;
@@ -317,11 +320,12 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.label.frame = labelFrame;
     
     CGFloat viewWidth;
-    if(self.accessoryButton)
+    if (self.accessoryButton) {
         viewWidth = self.accessoryButton.frame.origin.x + CGRectGetWidth(self.accessoryButton.frame);
-    else
+    }
+    else {
         viewWidth = self.label.frame.origin.x + CGRectGetWidth(self.label.frame);
-    
+    }
     viewWidth += HORIZONTAL_PADDING;
     //===========
     CGRect viewFrame = CGRectZero;
@@ -331,38 +335,38 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     self.gradientLayer.frame = self.bounds;
     
     self.isUsedGradient = NO;
-    if(!self.labelBackgroundColor && !self.gradientColors) {
+    if (!self.labelBackgroundColor && !self.gradientColors) {
         [self drawTagLabelUseLabelBackgroundColor:COLOR_WATER_BLUE animated:NO];
         return;
     }
     
-    if(self.labelBackgroundColor) {
+    if (self.labelBackgroundColor) {
         [self drawTagLabelUseLabelBackgroundColor:self.labelBackgroundColor animated:NO];
         return;
     }
     
     self.backgroundColor = nil;
     
-    NSMutableArray* gradientColors = nil;
-    NSArray* tempLocations = nil;
-    if(self.gradientColors && self.gradientColors.count > 2) {
+    NSMutableArray *gradientColors = nil;
+    NSArray *tempLocations = nil;
+    if (self.gradientColors && self.gradientColors.count > 2) {
         gradientColors = [NSMutableArray arrayWithCapacity:self.gradientColors.count];
         
         for (UIColor *color in self.gradientColors) {
             [gradientColors addObject:(id)color.CGColor];
         }
-        tempLocations = self.gradientLocations;
-        
-    } else if(self.gradientColors.count < 2) {
+        tempLocations = self.gradientLocations;  
+    }
+    else if(self.gradientColors.count < 2) {
         [self drawTagLabelUseLabelBackgroundColor:COLOR_WATER_BLUE animated:NO];
         return;
     }
     
     self.isUsedGradient = YES;
     
-    if(!tempLocations)
+    if (!tempLocations) {
         tempLocations = DEFAULT_LABEL_GRANDIEN_LOCATIONS;
-    
+    }
     [self drawTagLabelUseGradientColors:gradientColors
                               locations:tempLocations animated:NO];
 }
@@ -373,9 +377,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         [CATransaction setValue:(id)kCFBooleanTrue
                          forKey:kCATransactionDisableActions];
     }
-    else
+    else {
         [CATransaction setAnimationDuration:.3f];
-    
+    }
     self.layer.backgroundColor = color.CGColor;
     [CATransaction commit];
 }
@@ -384,7 +388,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
                             locations:(NSArray *)locations
                              animated:(BOOL)animated {
     [CATransaction begin];
-    if(!animated) {
+    if (!animated) {
         [CATransaction setValue:(id)kCFBooleanTrue
                          forKey:kCATransactionDisableActions];
     }
@@ -399,7 +403,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 }
 
 - (void)didMoveToSuperview {
-    if(![self.superview isKindOfClass:[GCTagList class]]) {
+    if (![self.superview isKindOfClass:[GCTagList class]]) {
         CGRect rect = self.frame;
         [self resizeLabel];
         CGRect frame = self.frame;
@@ -408,8 +412,8 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     }
 }
 
-- (NSString*)description {
-    NSString* description = [NSString stringWithFormat:@"<GCTagLabel:%p, index:%d, bounds:%@>",
+- (NSString *)description {
+    NSString *description = [NSString stringWithFormat:@"<GCTagLabel:%p, index:%d, bounds:%@>",
                              self,
                              _index,
                              [NSValue valueWithCGRect:self.bounds]];

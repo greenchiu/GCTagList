@@ -11,7 +11,7 @@
 #import <UIKit/UIKit.h>
 
 @interface UIColor (Uitilies)
-+ (UIColor*)colorWithString:(NSString*)colorString;
-- (UIColor*)darken:(CGFloat)percent;
-- (UIColor*)lighten:(CGFloat)percent;
++ (UIColor *)colorWithString:(NSString*)colorString;
+- (UIColor *)darken:(CGFloat)percent;
+- (UIColor *)lighten:(CGFloat)percent;
 @end

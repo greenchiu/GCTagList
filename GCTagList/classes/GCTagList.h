@@ -79,7 +79,7 @@
  * 
  * @retVal NSString the text for the TagLabel of theMaxRow's last one.
  */
-- (NSString*)tagList:(GCTagList *)tagList labelTextForGroupTagLabel:(NSInteger)interruptIndex;
+- (NSString *)tagList:(GCTagList *)tagList labelTextForGroupTagLabel:(NSInteger)interruptIndex;
 @end
 
 #pragma mark -
@@ -102,7 +102,7 @@
  * TagList最多幾行.
  * the max row at taglist.
  */
-- (NSInteger)maxNumberOfRowAtTagList:(GCTagList*)tagList;
+- (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList;
 
 /**
  * TagList最後一行的最後一個TagLabel(Group TagLabel)的AccessoryType.

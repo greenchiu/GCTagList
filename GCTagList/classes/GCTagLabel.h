@@ -89,13 +89,13 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
  * Limit TagLabel's max width, default is CGRectGetWidth([UIScreen mainScreen].bounds)
  */
 @property (assign) CGFloat maxWidth;
-+ (CGRect)rectangleOfTagLabelWithText:(NSString*)textStr
++ (CGRect)rectangleOfTagLabelWithText:(NSString *)textStr
                         labelMaxWidth:(CGFloat)maxWidth
-                            labelFont:(UIFont*)font
+                            labelFont:(UIFont *)font
                         accessoryType:(GCTagLabelAccessoryType)type;
 + (NSArray *)defaultGradoentColors;
-+ (GCTagLabel *)tagLabelWithReuseIdentifier:(NSString*)identifier;
-- (id)initReuseIdentifier:(NSString*)identifier;
++ (GCTagLabel *)tagLabelWithReuseIdentifier:(NSString *)identifier;
+- (id)initReuseIdentifier:(NSString *)identifier;
 
 /**
  * setLabelText, and the accessoryType is GCTagLabelAccessoryNone

@@ -10,7 +10,7 @@
 
 @implementation UIColor (Uitilies)
 
-+ (UIColor*)colorWithString:(NSString *)colorString {
++ (UIColor *)colorWithString:(NSString *)colorString {
     colorString = [colorString stringByReplacingOccurrencesOfString:@"#" withString:@""];
     colorString = [colorString stringByReplacingOccurrencesOfString:@"0x" withString:@""];
     switch ([colorString length]) {
@@ -32,7 +32,7 @@
             break;
     }
     uint32_t rgba;
-    NSScanner* scanner = [NSScanner scannerWithString:colorString];
+    NSScanner *scanner = [NSScanner scannerWithString:colorString];
     [scanner scanHexInt:&rgba];
     return [UIColor colorWithRed:((rgba & 0xFF000000) >> 24) / 255.f
                            green:((rgba & 0x00FF0000) >> 16) / 255.f
@@ -40,7 +40,7 @@
                            alpha:((rgba & 0x000000FF)) / 255.f];
 }
 
-- (UIColor*)darken:(CGFloat)percent {
+- (UIColor *)darken:(CGFloat)percent {
     percent = percent > 1 ? 1 : percent;
     percent = percent < 0 ? 0 : percent;
     
@@ -55,7 +55,7 @@
     
 }
 
-- (UIColor*)lighten:(CGFloat)percent {
+- (UIColor *)lighten:(CGFloat)percent {
     percent = percent > 1 ? 1 : percent;
     percent = percent < 0 ? 0 : percent;
     float rgba[4];
