@@ -138,9 +138,9 @@
 /**
  * 
  */
-//- (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList {
-//    return 1;
-//}
+- (NSInteger)maxNumberOfRowAtTagList:(GCTagList *)tagList {
+    return 2;
+}
 
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel {
     return GCTagLabelAccessoryArrowSign;

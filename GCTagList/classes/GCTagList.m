@@ -27,12 +27,25 @@
 #define GCLog(fmt, ...) 
 #endif
 
+typedef struct {
+    NSInteger nowRow;
+    NSInteger maxRow;
+} GCTagListRowRange ;
+
+GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
+    GCTagListRowRange rowRange;
+    rowRange.nowRow = nowRow;
+    rowRange.maxRow = maxRow;
+    return rowRange;
+}
 
 @interface GCTagList ()
 @property (nonatomic, GC_STRONG) NSMutableSet *visibleSet;
 @property (nonatomic, GC_STRONG) NSMutableDictionary *reuseSet;
-@property (assign) CGFloat rowMaxWidth;
+@property (assign) CGFloat rowMaxWidth __deprecated;
 @property (assign) NSInteger nowSelected;
+
+- (BOOL)checkImplementDataSourceRequireMehtod;
 
 /** add taglabel to resue set, if tag has not identifier, the tag will be release. */
 - (void)addTagLabelToReuseSet:(GCTagLabel *)tag;
@@ -45,10 +58,7 @@
 /**
  * if maxRow > 0, and the taglabel's row > maxRow, use this method to find the taglabel which one is the group label.
  */
-- (GCTagLabel*)tagLabelForInterruptIndex:(NSInteger)startIndex;
-
-/** layout taglabel with range; */
-- (void)layoutTagLabelsWithRange:(NSRange)range animation:(BOOL)animated;
+- (GCTagLabel *)tagLabelForInterruptIndex:(NSInteger)startIndex;
 
 /** if tag needs go the next row, return YES. */
 - (BOOL)needsGoToTheNextRowWidthFrame:(CGRect)frame preFrame:(CGRect)preFrame;
@@ -58,6 +68,19 @@
 
 /** update taglist's frame. */
 - (void)updateViewWithLastFrame:(CGRect)frame;
+
+/** layout taglabel with range; */
+- (void)layoutTagLabelsWithRange:(NSRange)range animation:(BOOL)animated;
+
+- (CGRect)layoutAndGetLastFrameWithRange:(NSRange)range
+                                rowRange:(NSRange)rowRange
+                                animated:(BOOL)animated
+                               lastFrame:(CGRect)lastframe;
+
+- (GCTagLabel *)layoutSingleTag:(GCTagLabel *)tag
+                        atIndex:(NSInteger)index
+                       rowRange:(GCTagListRowRange *)rowRange
+                    preTagFrame:(CGRect)preFrame;
 @end
 
 @implementation GCTagList
@@ -71,8 +94,6 @@
 }
 
 - (void)awakeFromNib {
-    
-    self.rowMaxWidth = CGRectGetWidth(self.frame);
     self.nowSelected = NSNotFound;
     self.firstRowLeftMargin = 0.f;
     self.backgroundColor = [UIColor clearColor];
@@ -89,7 +110,6 @@
     if(self) {
         self.nowSelected = NSNotFound;
         self.firstRowLeftMargin = 0.f;
-        self.rowMaxWidth = 0.f;
         self.backgroundColor = [UIColor clearColor];
         self.visibleSet = GC_AUTORELEASE([[NSMutableSet alloc] init]);
         self.reuseSet = GC_AUTORELEASE([[NSMutableDictionary alloc] init]);
@@ -100,7 +120,6 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.rowMaxWidth = CGRectGetWidth(frame);
         self.nowSelected = NSNotFound;
         self.firstRowLeftMargin = 0.f;
         self.backgroundColor = [UIColor clearColor];
@@ -323,7 +342,7 @@
         groupType = [self.dataSource accessoryTypeForGroupTagLabel];
     }
     
-    GCTagLabel* tag = nil;
+    GCTagLabel *tag = nil;
     CGRect rect = CGRectZero;
     for (int i = startIndex; i > 0; i--) {
         tag = [self tagLabelAtIndex:i];
@@ -332,7 +351,7 @@
         }
         
         rect = (i-1)>=0 ? [self tagLabelAtIndex:(i-1)].frame : CGRectZero;
-        NSString* tempText;
+        NSString *tempText;
         if ([self.delegate respondsToSelector:@selector(tagList:labelTextForGroupTagLabel:)]) {
             tempText = [self.delegate tagList:self labelTextForGroupTagLabel:i];
         }
@@ -344,6 +363,10 @@
                                                     labelMaxWidth:tag.maxWidth
                                                         labelFont:[tag valueForKeyPath:@"label.font"]
                                                     accessoryType:groupType];
+        
+        if (i-1 == 0) {
+            tempRect.origin.x = self.firstRowLeftMargin;
+        }
         
         BOOL isNeedGoNextRow = [self needsGoToTheNextRowWidthFrame:tempRect preFrame:rect];
         if (isNeedGoNextRow) {
@@ -371,7 +394,9 @@
     CGFloat labelMargin = CGRectGetWidth(preFrame) == 0.f ? 0 : LABEL_MARGIN;
     CGFloat occupyWidth = leftMargin + preFrame.origin.x +
     preFrame.size.width + CGRectGetWidth(frame) + labelMargin;
-    isNeed = self.rowMaxWidth < occupyWidth;
+    
+    CGFloat rowMaxWidth = CGRectGetWidth(self.frame);
+    isNeed = rowMaxWidth < occupyWidth;
     return isNeed;
 }
 
@@ -426,7 +451,7 @@
     
     
     NSInteger maxRow = 0, nowRow = 1;
-    if([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
+    if ([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
         maxRow = [self.dataSource maxNumberOfRowAtTagList:self];
     }
     
@@ -439,14 +464,16 @@
         groupType = [self.dataSource accessoryTypeForGroupTagLabel];
     }
     
-    NSMutableArray* animationTags;
-    NSMutableArray* values;
-    if(animated) {
+    NSMutableArray *animationTags;
+    NSMutableArray *values;
+    if (animated) {
         animationTags = [NSMutableArray arrayWithCapacity:range.length];
         values = [NSMutableArray arrayWithCapacity:range.length];
     }
     
+    GCTagListRowRange rowRagne = GCTagListRowRangeMake(nowRow, maxRow);
     CGRect preTagLabelFrame = CGRectZero;
+    CGFloat rowMaxWidth = CGRectGetWidth(self.frame);
     for (int i = startIndex; i < endIndex; i++) {
         /**
          * if there is previous label, get the previous's frame.
@@ -454,17 +481,17 @@
         if(CGRectEqualToRect(preTagLabelFrame, CGRectZero)) {
             preTagLabelFrame = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
         }
-        GCTagLabel* tag = [self.dataSource tagList:self tagLabelAtIndex:i];
-        if(animated) {
+        GCTagLabel *tag = [self.dataSource tagList:self tagLabelAtIndex:i];
+        if (animated) {
             tag.alpha = 0;
         }
         
-        if(tag.maxWidthFitToListWidth)
-            tag.maxWidth = CGRectGetWidth(self.frame);
-        
+        if (tag.maxWidthFitToListWidth) {
+            tag.maxWidth = rowMaxWidth;
+        }
         
         // set the font for tag's label.
-        if(self.labelFont) {
+        if (self.labelFont) {
             [tag setValue:self.labelFont forKeyPath:@"label.font"];
         }
         
@@ -472,40 +499,18 @@
         [tag setValue:[NSString stringWithFormat:@"%d",i] forKeyPath:@"index"];
         
         [self addTappedTarget:tag];
-        CGRect viewFrame = tag.frame;
+        tag = [self layoutSingleTag:tag
+                            atIndex:i
+                           rowRange:&rowRagne
+                        preTagFrame:preTagLabelFrame];
         
-        BOOL needsGoNextRow = [self needsGoToTheNextRowWidthFrame:viewFrame
-                                                         preFrame:preTagLabelFrame];
-        
-        CGFloat leftMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? self.firstRowLeftMargin : 0;
-        CGFloat labelMargin = CGRectGetWidth(preTagLabelFrame) == 0.f ? 0 : LABEL_MARGIN;
-        if (needsGoNextRow) {
-            if(CGRectGetWidth(preTagLabelFrame) > 0.f && maxRow > 0) {
-                nowRow ++;
-                if(nowRow > maxRow)  {
-                    [self addTagLabelToReuseSet:tag];
-                    tag = nil;
-                    tag = [self tagLabelForInterruptIndex:i];
-                    viewFrame = tag.frame;
-                } else {
-                    viewFrame.origin = CGPointMake(0,
-                                                   preTagLabelFrame.origin.y +
-                                                   CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
-                }
-            }
-            else {
-                viewFrame.origin = CGPointMake(0,
-                                               preTagLabelFrame.origin.y +
-                                               CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
-            }
-        } else {
-            viewFrame.origin = CGPointMake(leftMargin + preTagLabelFrame.origin.x + preTagLabelFrame.size.width + labelMargin ,
-                                           preTagLabelFrame.origin.y);
-        }
-        tag.frame = viewFrame;
+//        GCLog(@"index:%d, nowRow:%d", i, rowRagne.nowRow);
+        GCLog(@"after:%@", tag);
         [self addSubview:tag];
         
-        if(animated) {
+        CGRect viewFrame = tag.frame;
+        
+        if (animated) {
             [values addObject:[NSValue valueWithCGRect:viewFrame]];
             viewFrame.origin.y -= 10;
             tag.frame = viewFrame;
@@ -515,31 +520,31 @@
         
         [self.visibleSet addObject:tag];
         preTagLabelFrame = viewFrame;
-        if(maxRow > 0 && nowRow > maxRow) {
+        if ( rowRagne.maxRow > 0 && rowRagne.nowRow > rowRagne.maxRow) {
             break;
         }
     }
     
-    if(animated) {
+    if (animated) {
         [UIView animateWithDuration:0.33f animations:^ {
             for (int i = 0; i < values.count ; i++) {
                 CGRect frame = [[values objectAtIndex:i] CGRectValue];
-                GCTagLabel* tag = [animationTags objectAtIndex:i];
+                GCTagLabel *tag = [animationTags objectAtIndex:i];
                 tag.frame = frame;
                 tag.alpha = 1.f;
             }
         }];
     }
     
-    if(endIndex < numberOfTagLabel) {
+    if (endIndex < numberOfTagLabel) {
         NSRange layoutRange = NSMakeRange(endIndex, numberOfTagLabel - endIndex);
         preTagLabelFrame = [self layoutAndGetLastFrameWithRange:layoutRange
-                                                       rowRange:NSMakeRange(nowRow, maxRow)
+                                                       rowRange:NSMakeRange( rowRagne.nowRow, rowRagne.maxRow)
                                                        animated:animated
                                                       lastFrame:preTagLabelFrame];
     }
     
-    for (NSString* key in [self.reuseSet allKeys]) {
+    for (NSString *key in [self.reuseSet allKeys]) {
         NSMutableSet *set = [self.reuseSet objectForKey:key];
         [set minusSet:self.visibleSet];
         [self.reuseSet setObject:set forKey:key];
@@ -547,6 +552,7 @@
     
     
     [self updateViewWithLastFrame:preTagLabelFrame];
+    
 }
 
 - (CGRect)layoutAndGetLastFrameWithRange:(NSRange)range
@@ -571,22 +577,23 @@
     CGRect viewFrame, preframe = lastframe;
     NSInteger currentIndex = range.location;
     
-    NSMutableArray* moveTag = [NSMutableArray array];
+    NSMutableArray *moveTag = [NSMutableArray array];
     
     for (int i = currentIndex; i < total ; i++) {
         
         if (i == currentIndex && CGRectEqualToRect(lastframe, CGRectNull)) {
             preframe = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
-        } else if(i > currentIndex) {
+        }
+        else if(i > currentIndex) {
             preframe = [[[moveTag lastObject] objectForKey:@"frame"] CGRectValue];
         }
         
-        GCTagLabel* tag = [self tagLabelAtIndex:i];
+        GCTagLabel *tag = [self tagLabelAtIndex:i];
         viewFrame = tag.frame;
         
         if (i == currentIndex) {
             CGFloat dy = ABS(viewFrame.origin.y - preframe.origin.y);
-            if(dy == 10.f) {
+            if (dy == 10.f) {
                 viewFrame.origin.y = preframe.origin.y;
             }
         }
@@ -597,14 +604,16 @@
         CGFloat leftMargin = CGRectGetWidth(preframe) == 0.f ? self.firstRowLeftMargin : 0;
         CGFloat labelMargin = CGRectGetWidth(preframe) == 0.f ? 0 : LABEL_MARGIN;
         if (needsGoNextRow) {
-            if(CGRectGetWidth(preframe) > 0.f && maxRow > 0) {
+            if (CGRectGetWidth(preframe) > 0.f && maxRow > 0) {
                 nowRow ++;
-                if(nowRow > maxRow)  {
+                if (nowRow > maxRow)  {
                     [self addTagLabelToReuseSet:tag];
+                    [tag removeFromSuperview];
                     tag = nil;
                     tag = [self tagLabelForInterruptIndex:i];
                     viewFrame = tag.frame;
-                } else {
+                }
+                else {
                     viewFrame.origin = CGPointMake(0,
                                                    preframe.origin.y +
                                                    CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
@@ -615,7 +624,8 @@
                                                preframe.origin.y +
                                                CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
             }
-        } else {
+        }
+        else {
             viewFrame.origin = CGPointMake(leftMargin + preframe.origin.x + preframe.size.width + labelMargin ,
                                            preframe.origin.y);
         }
@@ -628,18 +638,22 @@
         [moveTag addObject:dict];
         
         preframe = viewFrame;
+        if (maxRow > 0 && nowRow > maxRow) {
+            break;
+        }
     }
     
     if(!animated) {
         for (NSDictionary *dict in moveTag) {
-            GCTagLabel* tag = [dict objectForKey:@"target"];
+            GCTagLabel *tag = [dict objectForKey:@"target"];
             tag.frame = [[dict objectForKey:@"frame"] CGRectValue];
         }
-    } else {
+    }
+    else {
         [UIView animateWithDuration:.33f
                          animations:^{
                              for (NSDictionary *dict in moveTag) {
-                                 GCTagLabel* tag = [dict objectForKey:@"target"];
+                                 GCTagLabel *tag = [dict objectForKey:@"target"];
                                  tag.frame = [[dict objectForKey:@"frame"] CGRectValue];
                              }
                          }];
@@ -650,6 +664,47 @@
     }
     
     return preframe;
+}
+
+- (GCTagLabel *)layoutSingleTag:(GCTagLabel *)tag
+                        atIndex:(NSInteger)index
+                       rowRange:(GCTagListRowRange *)rowRange
+                    preTagFrame:(CGRect)preFrame {
+    CGRect viewFrame = tag.frame;
+    
+    BOOL needsGoNextRow = [self needsGoToTheNextRowWidthFrame:viewFrame
+                                                     preFrame:preFrame];
+    
+    CGFloat leftMargin = CGRectGetWidth(preFrame) == 0.f ? self.firstRowLeftMargin : 0;
+    CGFloat labelMargin = CGRectGetWidth(preFrame) == 0.f ? 0 : LABEL_MARGIN;
+    if (needsGoNextRow) {
+        rowRange->nowRow ++;
+        if (CGRectGetWidth(preFrame) > 0.f && rowRange->maxRow > 0) {
+            if (rowRange->nowRow > rowRange->maxRow)  {
+                [tag removeFromSuperview];
+                [self addTagLabelToReuseSet:tag];
+                tag = nil;
+                tag = [self tagLabelForInterruptIndex:index];
+                GCLog(@"%@", tag);
+                viewFrame = tag.frame;
+            }
+            else {
+                viewFrame.origin = CGPointMake(0,
+                                               preFrame.origin.y +
+                                               CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
+            }
+        }
+        else {
+            viewFrame.origin = CGPointMake(0,
+                                           preFrame.origin.y +
+                                           CGRectGetHeight(viewFrame) + BOTTOM_MARGIN);
+        }
+    } else {
+        viewFrame.origin = CGPointMake(leftMargin + preFrame.origin.x + preFrame.size.width + labelMargin ,
+                                       preFrame.origin.y);
+    }
+    tag.frame = viewFrame;
+    return tag;
 }
 
 #pragma mark -

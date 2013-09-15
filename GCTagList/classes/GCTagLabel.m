@@ -118,8 +118,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
         CGPoint buttonPoint = CGPointZero;
         
         buttonPoint.x = textSize.width + LabelHorizontalPadding;
-        if (!needCorrection)
+        if (!needCorrection) {
             buttonPoint.x -= 9;
+        }
         buttonPoint.y = (textSize.height - 24) / 2 ;
         
         buttonFrame = CGRectMake(0, 0, ACCESSORYVIEW_WIDTH, ACCESSORYVIEW_WIDTH);
@@ -413,10 +414,11 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 }
 
 - (NSString *)description {
-    NSString *description = [NSString stringWithFormat:@"<GCTagLabel:%p, index:%d, bounds:%@>",
+    NSString *description = [NSString stringWithFormat:@"<GCTagLabel:%p, index:%d, text:%@, frame:%@>",
                              self,
                              _index,
-                             [NSValue valueWithCGRect:self.bounds]];
+                             self.label.text,
+                             [NSValue valueWithCGRect:self.frame]];
     return description;
 }
 
