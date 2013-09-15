@@ -40,7 +40,6 @@
      */
     
     self.nibTagList.labelFont = [UIFont systemFontOfSize:18.f];
-    
     [self.nibTagList reloadData];
     
     /*

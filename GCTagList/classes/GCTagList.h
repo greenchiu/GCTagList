@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "GCTagLabel.h"
 
-#define gctaglist_version @"1.3.1"
+#define gctaglist_version @"1.3.2"
 
 #ifndef GC_SUPPORT_ARC
     #if __has_feature(objc_arc)
