@@ -444,12 +444,10 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     NSInteger startIndex = range.location;
     NSInteger endIndex = startIndex + range.length;
     
-    
     if(endIndex > numberOfTagLabel) {
         GCLog(@"the range is error.");
         return;
     }
-    
     
     NSInteger maxRow = 0, nowRow = 1;
     if ([self.dataSource respondsToSelector:@selector(maxNumberOfRowAtTagList:)]) {
@@ -549,17 +547,13 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
         [self.reuseSet setObject:set forKey:key];
     }
     
-    
     [self updateViewWithLastFrame:preTagLabelFrame];
-    
 }
 
 - (CGRect)layoutAndGetLastFrameWithRange:(NSRange)range
                                 rowRange:(GCTagListRowRange *)rowRange
                                 animated:(BOOL)animated
                                lastFrame:(CGRect)lastframe {
-    
-//    NSInteger maxRow = rowRange.length, nowRow = rowRange.location;
     NSInteger total = range.location + range.length;
     /**
      * maxRow default 0, it means not limit maxRow.
