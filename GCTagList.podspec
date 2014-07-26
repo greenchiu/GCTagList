@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.author       = { "greenchiu" => "handkid1986@gmail.com" }
   s.source       = { :git => "https://github.com/greenchiu/GCTagList.git", :tag => '1.3.2' }
   s.platform     = :ios, '5.0'
-  s.source_files = 'GCTagList/classes/GCTagList.{h,m}'
+  s.source_files = 'GCTagList/classes/*'
   s.resource     = "GCTagList/assets/CGTagList.bundle"
   s.framework    = 'QuartzCore'
   s.requires_arc = false
