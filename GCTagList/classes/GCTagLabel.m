@@ -414,9 +414,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 }
 
 - (NSString *)description {
-    NSString *description = [NSString stringWithFormat:@"<GCTagLabel:%p, index:%d, text:%@, frame:%@>",
+    NSString *description = [NSString stringWithFormat:@"<GCTagLabel:%p, index:%ld, text:%@, frame:%@>",
                              self,
-                             _index,
+                             (long)_index,
                              self.label.text,
                              [NSValue valueWithCGRect:self.frame]];
     return description;

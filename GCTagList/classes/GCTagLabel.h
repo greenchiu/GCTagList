@@ -104,6 +104,9 @@ typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
 - (void)setLabelText:(NSString*)text accessoryType:(GCTagLabelAccessoryType)type;
 - (void)setSelected:(BOOL)selected animation:(BOOL)animated;
 - (void)setCornerRadius:(CGFloat)cornerRadius; // default is 12.f
+
+- (void)resizeLabel;
+
 @end
 
 

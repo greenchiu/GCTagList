@@ -195,7 +195,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     NSInteger sIndex = range.location;
     NSInteger eIndex = sIndex + range.length;
     
-    for (int i = sIndex; i < eIndex; i++) {
+    for (NSInteger i = sIndex; i < eIndex; i++) {
         GCTagLabel *tag = [self tagLabelAtIndex:i];
         if (tag) {
             [tag removeFromSuperview];
@@ -230,7 +230,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     }
     
     NSMutableArray *tempAry = [NSMutableArray arrayWithCapacity:oldCount-range.length];
-    for (int i = range.location+range.length; i < oldCount; i++) {
+    for (NSInteger i = range.location+range.length; i < oldCount; i++) {
         GCTagLabel *tag = [self tagLabelAtIndex:i];
         [tempAry addObject:tag];
     }
@@ -238,7 +238,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     for (int i = 0; i < tempAry.count; i++) {
         NSInteger newIndex = range.location + i;
         GCTagLabel *tag = [tempAry objectAtIndex:i];
-        [tag setValue:[NSString stringWithFormat:@"%d", newIndex] forKeyPath:@"index"];
+        [tag setValue:[NSString stringWithFormat:@"%ld", (long)newIndex] forKeyPath:@"index"];
     }
     
     
@@ -271,7 +271,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     NSInteger oldCount = [self.visibleSet count];
     
     NSMutableArray *tempAry = [NSMutableArray arrayWithCapacity:0];
-    for (int i = range.location; i < oldCount; i++) {
+    for (NSInteger i = range.location; i < oldCount; i++) {
         [tempAry addObject:[self tagLabelAtIndex:i]];
     }
     
@@ -279,7 +279,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     for (int i = 0; i < tempAry.count; i++) {
         NSInteger newIndex = sIndex + i;
         GCTagLabel *tag = [tempAry objectAtIndex:i];
-        [tag setValue:[NSString stringWithFormat:@"%d", newIndex] forKeyPath:@"index"];
+        [tag setValue:[NSString stringWithFormat:@"%ld", (long)newIndex] forKeyPath:@"index"];
     }
     
     [self layoutTagLabelsWithRange:range animation:animated];
@@ -345,7 +345,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     
     GCTagLabel *tag = nil;
     CGRect rect = CGRectZero;
-    for (int i = startIndex; i > 0; i--) {
+    for (NSInteger i = startIndex; i > 0; i--) {
         tag = [self tagLabelAtIndex:i];
         if (!tag) {
             continue;
@@ -473,7 +473,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     GCTagListRowRange rowRagne = GCTagListRowRangeMake(nowRow, maxRow);
     CGRect preTagLabelFrame = CGRectZero;
     CGFloat rowMaxWidth = CGRectGetWidth(self.frame);
-    for (int i = startIndex; i < endIndex; i++) {
+    for (NSInteger i = startIndex; i < endIndex; i++) {
         /**
          * if there is previous label, get the previous's frame.
          */
@@ -495,7 +495,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
         }
         
         [tag performSelector:@selector(resizeLabel)];
-        [tag setValue:[NSString stringWithFormat:@"%d",i] forKeyPath:@"index"];
+        [tag setValue:[NSString stringWithFormat:@"%ld",(long)i] forKeyPath:@"index"];
         
         [self addTappedTarget:tag];
         tag = [self layoutSingleTag:tag
@@ -559,7 +559,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
      * maxRow default 0, it means not limit maxRow.
      */
     if(rowRange->nowRow > rowRange->maxRow && rowRange->maxRow > 0) {
-        for (int i = range.location; i < total ; i++) {
+        for (NSInteger i = range.location; i < total ; i++) {
             GCTagLabel *tag = [self tagLabelAtIndex:i];
             [tag removeFromSuperview];
             [self addTagLabelToReuseSet:tag];
@@ -572,7 +572,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     
     NSMutableArray *moveTag = [NSMutableArray array];
     
-    for (int i = currentIndex; i < total ; i++) {
+    for (NSInteger i = currentIndex; i < total ; i++) {
         
         if (i == currentIndex && CGRectEqualToRect(lastframe, CGRectNull)) {
             preframe = i - 1 >= 0 ? [self tagLabelAtIndex:i-1].frame : CGRectZero;
