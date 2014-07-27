@@ -68,10 +68,10 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
             imageFontLeftInset = 10;
             break;
         case GCTagLabelAccessoryCrossSign:
-            imageFontLeftInset = 9;
+            imageFontLeftInset = 10;
             break;
         case GCTagLabelAccessoryPlusSign:
-            imageFontLeftInset = 9;
+            imageFontLeftInset = 10;
             break;
         default:
             imageFontLeftInset = 0;
@@ -287,10 +287,17 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
 }
 
 - (void)resizeLabel {
-    CGSize textSize = [self.label.text sizeWithFont:self.label.font
-                                  constrainedToSize:self.fitSize
-                                      lineBreakMode:NSLineBreakByWordWrapping];
     
+    BOOL noText = self.label.text.length == 0;
+    NSString *testText = noText ? @"X" : self.label.text;
+    
+    CGSize textSize = [testText sizeWithFont:self.label.font
+                           constrainedToSize:self.fitSize
+                               lineBreakMode:NSLineBreakByWordWrapping];
+    
+    if (noText) {
+        textSize.width = 0.0;
+    }
     
     //===========
     CGFloat deviationValue = self.accessoryType != GCTagLabelAccessoryNone ? ACCESSORYVIEW_WIDTH : 0;
@@ -356,7 +363,7 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
     
     NSMutableArray *gradientColors = nil;
     NSArray *tempLocations = nil;
-    if (self.gradientColors && self.gradientColors.count > 2) {
+    if (self.gradientColors.count > 2) {
         gradientColors = [NSMutableArray arrayWithCapacity:self.gradientColors.count];
         
         for (UIColor *color in self.gradientColors) {
