@@ -54,7 +54,8 @@ extern CGFloat const LabelVerticalPadding;
 typedef NS_ENUM(NSInteger, GCTagLabelAccessoryType) {
     GCTagLabelAccessoryNone,
     GCTagLabelAccessoryCrossSign,
-    GCTagLabelAccessoryArrowSign
+    GCTagLabelAccessoryArrowSign,
+    GCTagLabelAccessoryPlusSign
 };
 
 @interface GCTagLabel : UIView

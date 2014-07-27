@@ -49,6 +49,9 @@ NSString * imageFontNameForType(GCTagLabelAccessoryType type) {
         case GCTagLabelAccessoryCrossSign:
             imageFontName = @"CGTagList.bundle/blue_close.png";
             break;
+        case GCTagLabelAccessoryPlusSign:
+            imageFontName = @"CGTagList.bundle/play_add.png";
+            break;
         default:
             imageFontName = nil;
             break;
@@ -65,6 +68,9 @@ CGFloat imageFontLeftInsetForType(GCTagLabelAccessoryType type) {
             imageFontLeftInset = 10;
             break;
         case GCTagLabelAccessoryCrossSign:
+            imageFontLeftInset = 9;
+            break;
+        case GCTagLabelAccessoryPlusSign:
             imageFontLeftInset = 9;
             break;
         default:
