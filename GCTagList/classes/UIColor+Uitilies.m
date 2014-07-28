@@ -44,7 +44,7 @@
     percent = percent > 1 ? 1 : percent;
     percent = percent < 0 ? 0 : percent;
     
-    float rgba[4];
+    CGFloat rgba[4];
     [self getRGBA:rgba];
     UIColor* darkerColor = [UIColor colorWithRed:MAX(rgba[0]-percent, 0)
                                            green:MAX(rgba[1]-percent, 0)
@@ -58,7 +58,7 @@
 - (UIColor *)lighten:(CGFloat)percent {
     percent = percent > 1 ? 1 : percent;
     percent = percent < 0 ? 0 : percent;
-    float rgba[4];
+    CGFloat rgba[4];
     [self getRGBA:rgba];
     UIColor* lighterColor = [UIColor colorWithRed:MIN(rgba[0]+percent, 1)
                                             green:MIN(rgba[1]+percent, 1)
@@ -68,9 +68,9 @@
     return lighterColor;
 }
 
-- (void)getRGBA:(float*)rgba {
+- (void)getRGBA:(CGFloat*)rgba {
     CGColorSpaceModel colorModel = CGColorSpaceGetModel(CGColorGetColorSpace(self.CGColor));
-    const float* colorComponents = CGColorGetComponents( self.CGColor );
+    const CGFloat* colorComponents = CGColorGetComponents( self.CGColor );
     switch (colorModel)
     {
         case kCGColorSpaceModelMonochrome:
