@@ -413,7 +413,7 @@ GCTagListRowRange GCTagListRowRangeMake(NSInteger nowRow, NSInteger maxRow) {
     
     NSInteger tempRow = 1;
     CGFloat h = [GCTagList heightOfRows:tempRow font:self.labelFont];
-    while (h != occupyHeight) {
+    while (h <= occupyHeight) {
         tempRow++;
         h = [GCTagList heightOfRows:tempRow font:self.labelFont];
     }
