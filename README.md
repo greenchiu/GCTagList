@@ -6,11 +6,11 @@ GCTagList like iOS Mail app's sender or recivers tags.
 ![](Screenshot.png) 
 ![](Screenshot2.png)
 
-##Installation
+## Installation
 
 Simple copy over the `classes` folder and `assets` folder into your project and make sure you have linked the framework `QuartzCore.framework`, and import the `GCTagList.h`.
 
-###CocoaPods
+### CocoaPods
 
 use GCTagList with CocoaPods
 
@@ -18,7 +18,7 @@ use GCTagList with CocoaPods
 pod 'GCTagList', '~> 1.3'
 ```
 
-##What's new 
+## What's new 
 
 
 > I split up the class to three parts, `GCTagList`、`GCTagLabel` and `UIColor+Uitiles` with v1.3.1; I hope this way could more easy to read and maintain.
@@ -61,17 +61,17 @@ pod 'GCTagList', '~> 1.3'
 
 I try to imitate UITableView's way - @greenchiu
 
-##next version(1.4) will support
+## next version(1.4) will support
 
 * custom accessoryButton.
 * more accessoryType for TagLabel.
 
-##Supports
+## Supports
 
 * ARC
 * iOS 5.0 ~
 
-##How to use
+## How to use
 implementation the GCTagListDataSource and call the public method `reloadData`  
 
 ```Objective-C   
@@ -108,7 +108,7 @@ implementation the GCTagListDataSource and call the public method `reloadData`
 ```
 
 
-##GCTagListDelegate Protocol
+## GCTagListDelegate Protocol
 
 ```Objective-C   
 /**
@@ -135,7 +135,7 @@ implementation the GCTagListDataSource and call the public method `reloadData`
 - (NSString*)tagList:(GCTagList *)tagList labelTextForGroupTagLabel:(NSInteger)interruptIndex;
 ```
 
-##GCTagListDataSource Protocol
+## GCTagListDataSource Protocol
 ```Objective-C   
 /**
  * how many count for taglist to display.
@@ -159,12 +159,12 @@ implementation the GCTagListDataSource and call the public method `reloadData`
 - (GCTagLabelAccessoryType)accessoryTypeForGroupTagLabel;
 ```
 
-##Reference
+## Reference
 
 * [DWTagList](https://github.com/domness/DWTagList)
 * [ColorUtils](https://github.com/nicklockwood/ColorUtils)
 
-##License
+## License
 
 Use this control in your apps? Let me know!
 
